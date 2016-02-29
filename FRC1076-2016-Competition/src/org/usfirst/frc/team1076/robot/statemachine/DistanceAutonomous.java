@@ -1,7 +1,9 @@
 package org.usfirst.frc.team1076.robot.statemachine;
 
 import org.usfirst.frc.team1076.robot.gamepad.IInput.MotorOutput;
-import org.usfirst.frc.team1076.udp.SensorData;
+
+// TODO: Actually use SensorData to change motor output
+// import org.usfirst.frc.team1076.udp.SensorData;
 
 public class DistanceAutonomous extends AutoState {
 
@@ -11,13 +13,13 @@ public class DistanceAutonomous extends AutoState {
 	
 	// Assuming calibrated factors for now.
 	// ASSUMPTIONS: The motors move at a constant speed given a particular MotorOutput()
-	// 	            That MotorOutputs are periodic
+	// and  that MotorOutputs are periodic.
 	
-	private double MOTOR_FACTOR = 1; // TODO: Find a reasonable value for this.
-	private double PERIOD = 0.1; // TODO: Find a reasonable value for this.
-	private double speed;
-	private double distanceTraveled = 0;
-	private double distance;
+	double MOTOR_FACTOR = 1; // TODO: Find a reasonable value for this.
+	
+	double speed;
+	double distanceTraveled = 0;
+	double distance;
 	
 	public DistanceAutonomous(double distance, double time) {
 		this.distance = distance;
@@ -26,20 +28,33 @@ public class DistanceAutonomous extends AutoState {
 
 	
 	@Override
-	public void init() {  }
+	public void init() { }
 
 	@Override
 	public boolean shouldChange() {
 		// TODO Auto-generated method stub
+
 		return distanceTraveled > distance;
 	}
 
+	// time, in seconds of how often DistanceAutonomous is called.
+	private long lastFrameTime = 0; // TODO: Find a reasonable value for this
+	
 	@Override
 	public MotorOutput driveTrainSpeed() {
+		if (lastFrameTime == 0) {
+			lastFrameTime = System.nanoTime(); 
+		}
+		double deltaTime = (System.nanoTime() - lastFrameTime) / 1e9;
+		lastFrameTime = System.nanoTime();
 		
-		distanceTraveled += speed * MOTOR_FACTOR * PERIOD;
+		distanceTraveled += speed * MOTOR_FACTOR * deltaTime;
 		
-		return new MotorOutput(speed, speed);
+		if (shouldChange()) {
+			return new MotorOutput(0, 0);
+		} else {
+			return new MotorOutput(speed, speed);
+		}
 	}
 
 	@Override
