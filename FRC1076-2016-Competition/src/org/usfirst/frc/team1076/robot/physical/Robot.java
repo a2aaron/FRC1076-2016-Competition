@@ -49,10 +49,11 @@ public class Robot extends IterativeRobot implements IRobot {
 	static final int RIGHT_INDEX = 1;
 	static final int RIGHT_FOLLOWER_INDEX = 2;
 	static final int INTAKE_INDEX = 5;
+	// None of the below indexes are correct.
 	static final int ARM_INDEX = 8;
+	static final int ARM_FOLLOWER_INDEX = 9;
 	static final int ARM_EXTEND_INDEX = 7;
 	static final int ARM_EXTEND_FOLLOWER_INDEX = 6;
-	
 	double MOTOR_POWER_FACTOR = 0.9;
 	
 	CANTalon leftMotor = new CANTalon(LEFT_INDEX);
@@ -63,6 +64,7 @@ public class Robot extends IterativeRobot implements IRobot {
 	CANTalon armExtendMotor = new CANTalon(ARM_EXTEND_INDEX);
 	CANTalon armExtendFollower = new CANTalon(ARM_EXTEND_FOLLOWER_INDEX);
 	CANTalon armMotor = new CANTalon(ARM_INDEX);
+	CANTalon armFollower = new CANTalon(ARM_FOLLOWER_INDEX);
 	Servo lidarServo = new Servo(0);
 	
 	Compressor compressor = new Compressor(0);
@@ -122,9 +124,9 @@ public class Robot extends IterativeRobot implements IRobot {
 		leftFollower.setInverted(true);
 		leftMotor.setInverted(true);
 		armMotor.enableBrakeMode(true);
+		armFollower.enableBrakeMode(true);
 		armExtendMotor.enableBrakeMode(true);
 		armExtendFollower.enableBrakeMode(true);
-		
 		// leftFollower.changeControlMode(TalonControlMode.Follower);
 		// leftFollower.set(LEFT_INDEX);
 		
@@ -285,6 +287,7 @@ public class Robot extends IterativeRobot implements IRobot {
 	@Override
 	public void setArmSpeed(double speed) {
 		armMotor.set(speed * armSpeed);
+		armFollower.set(speed * armSpeed);
 	}
 	
 	@Override
