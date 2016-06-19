@@ -40,6 +40,7 @@ public class AutoController implements IRobotController {
 			autoState.init(); // Initialize the new autonomous mode
 		}
 		robot.setArmSpeed(autoState.armSpeed());
+		robot.setArmExtendSpeed(autoState.armExtendSpeed());
 		robot.setIntakeSpeed(autoState.intakeSpeed());
 		MotorOutput drive = autoState.driveTrainSpeed();
 		robot.setLeftSpeed(drive.left);

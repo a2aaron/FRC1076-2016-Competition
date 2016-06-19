@@ -7,10 +7,8 @@ import org.usfirst.frc.team1076.robot.gamepad.IDriverInput.MotorOutput;
 import org.usfirst.frc.team1076.robot.statemachine.ArmAutonomous;
 import org.usfirst.frc.team1076.robot.statemachine.ArmAutonomous.LiftDirection;
 import org.usfirst.frc.team1076.robot.statemachine.AutoState;
-import org.usfirst.frc.team1076.test.mock.MockRobot;
 
 public class ArmAutonomousTest {
-	MockRobot robot = new MockRobot();
 	private static final double EPSILON = 1e-12;
 
 	@Test
