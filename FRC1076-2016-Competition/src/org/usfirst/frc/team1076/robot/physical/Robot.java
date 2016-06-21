@@ -127,6 +127,7 @@ public class Robot extends IterativeRobot implements IRobot {
 		armFollower.enableBrakeMode(true);
 		armExtendMotor.enableBrakeMode(true);
 		armExtendFollower.enableBrakeMode(true);
+
 		
 		armMotor.ConfigFwdLimitSwitchNormallyOpen(true);
 		armMotor.ConfigRevLimitSwitchNormallyOpen(true);
@@ -167,6 +168,11 @@ public class Robot extends IterativeRobot implements IRobot {
 	 */
 	@Override
     public void autonomousInit() {
+	    // Setting the limit switch to be normally closed
+	    // ensures that the motors will disable if the limit switches break.
+	    armMotor.ConfigFwdLimitSwitchNormallyOpen(false);
+	    armFollower.ConfigFwdLimitSwitchNormallyOpen(false);
+
 		sensorData.sendAttackColor("tegra-ubuntu:5888", SmartDashboard.getString("Enemy Color"));
 		
 		if (SmartDashboard.getBoolean("Auto Program Enabled")) {
@@ -219,6 +225,12 @@ public class Robot extends IterativeRobot implements IRobot {
 
     @Override
     public void teleopInit() {
+        // Setting the limit switches to be normally open
+        // ensures the motor always works even when the limit switch
+        // does not work. Note that this will cause a brief disabling of the arm.
+        armMotor.ConfigFwdLimitSwitchNormallyOpen(true);
+        armFollower.ConfigFwdLimitSwitchNormallyOpen(true);
+
     	lidarMotorSpeed = SmartDashboard.getNumber("Initial Lidar Speed");
     	
     	if (teleopController != null) {
