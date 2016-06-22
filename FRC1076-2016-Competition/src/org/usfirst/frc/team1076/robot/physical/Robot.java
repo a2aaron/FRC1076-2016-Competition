@@ -136,6 +136,23 @@ public class Robot extends IterativeRobot implements IRobot {
 		armExtendMotor.enableLimitSwitch(true, true);
 		// leftFollower.changeControlMode(TalonControlMode.Follower);
 		// leftFollower.set(LEFT_INDEX);
+
+		// These are the physical limit switches. By default it
+		// initalizes in the "normally open" state.
+		armMotor.enableLimitSwitch(true, true);
+		armFollower.enableLimitSwitch(true, true);
+		// Soft Limits are limits which disable the motor if
+		// the "Sensor Position" (the encoder) is outside a certain range
+		// This is disabled in teleop.
+		// TODO: Find true soft limits
+		armMotor.setForwardSoftLimit(10000);
+		armMotor.setReverseSoftLimit(10000);
+		armMotor.enableForwardSoftLimit(true);
+		armMotor.enableReverseSoftLimit(true);
+		armExtendMotor.setForwardSoftLimit(-10000);
+		armExtendMotor.setReverseSoftLimit(-10000);
+		armExtendMotor.enableForwardSoftLimit(true);
+		armExtendMotor.enableReverseSoftLimit(true);
 		
 		compressor.setClosedLoopControl(true);
 		setIntakeElevation(IntakeRaiseState.Raised);
@@ -220,7 +237,12 @@ public class Robot extends IterativeRobot implements IRobot {
     @Override
     public void teleopInit() {
     	lidarMotorSpeed = SmartDashboard.getNumber("Initial Lidar Speed");
-    	
+    	// Disabling the soft limits still keeps the limit switch working.
+        armMotor.enableForwardSoftLimit(false);
+        armMotor.enableReverseSoftLimit(false);
+        armExtendMotor.enableForwardSoftLimit(false);
+        armExtendMotor.enableReverseSoftLimit(false);
+
     	if (teleopController != null) {
     		teleopController.teleopInit(this);
     	} else {
