@@ -17,6 +17,7 @@ import org.usfirst.frc.team1076.robot.gamepad.OperatorInput;
 import org.usfirst.frc.team1076.robot.gamepad.TankInput;
 import org.usfirst.frc.team1076.robot.sensors.DistanceEncoder;
 import org.usfirst.frc.team1076.robot.sensors.IDistanceEncoder;
+import org.usfirst.frc.team1076.robot.statemachine.ArmAutonomous;
 import org.usfirst.frc.team1076.robot.statemachine.AutoState;
 import org.usfirst.frc.team1076.robot.statemachine.ForwardAutonomous;
 import org.usfirst.frc.team1076.robot.statemachine.IntakeAutonomous;
@@ -189,7 +190,8 @@ public class Robot extends IterativeRobot implements IRobot {
 			autoDriveDistance = SmartDashboard.getNumber("Distance");
 			lidarMotorSpeed = SmartDashboard.getNumber("Initial Lidar Speed");
 			autoController = new AutoController(
-					new ForwardAutonomous(600, -0.5)
+			        new ArmAutonomous(1000, ArmAutonomous.LiftDirection.Down)
+					.addNext(new ForwardAutonomous(600, -0.5))
 					.addNext(new RotateAutonomous(320, -1, RotateAutonomous.TurnDirection.Left))
 					.addNext(new ForwardAutonomous(4100, -0.5))
 					.addNext(new RotateAutonomous(750, -1, RotateAutonomous.TurnDirection.Right))
