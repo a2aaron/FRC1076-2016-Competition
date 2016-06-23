@@ -3,8 +3,6 @@ package org.usfirst.frc.team1076.robot.statemachine;
 import java.util.concurrent.TimeUnit;
 
 public class ArmAutonomous extends AutoState {
-	// MAJOR TODO: Use Encoders or Limit Switches
-	//(once they're put on the robot)
 	public enum LiftDirection {
 		Up, Down
 	};
@@ -38,17 +36,16 @@ public class ArmAutonomous extends AutoState {
 
 	@Override
 	public double armSpeed() {
-		if (shouldChange()) {
-			return 0;
-		} else {
-			switch (liftDirection) {
-			case Up:
-				return speed;
-			case Down:
-				return -speed;
-			default:
-				return 0;
-			}
-		}
+	    if (shouldChange()) {
+	        return 0;
+	    }
+	    switch (liftDirection) {
+	    case Up:
+	        return speed;
+	    case Down:
+	        return -speed;
+	    default:
+	        return 0;
+	    }
 	}
 }
