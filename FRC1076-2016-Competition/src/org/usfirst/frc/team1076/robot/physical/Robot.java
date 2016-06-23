@@ -132,9 +132,15 @@ public class Robot extends IterativeRobot implements IRobot {
 		armMotor.ConfigFwdLimitSwitchNormallyOpen(true);
 		armMotor.ConfigRevLimitSwitchNormallyOpen(true);
 		armMotor.enableLimitSwitch(true, true);
+		armFollower.ConfigFwdLimitSwitchNormallyOpen(true);
+		armFollower.ConfigRevLimitSwitchNormallyOpen(true);
+		armFollower.enableLimitSwitch(true, true);
 		armExtendMotor.ConfigFwdLimitSwitchNormallyOpen(true);
 		armExtendMotor.ConfigRevLimitSwitchNormallyOpen(true);
 		armExtendMotor.enableLimitSwitch(true, true);
+		armExtendFollower.ConfigFwdLimitSwitchNormallyOpen(true);
+		armExtendFollower.ConfigRevLimitSwitchNormallyOpen(true);
+		armExtendFollower.enableLimitSwitch(true, true);
 		// leftFollower.changeControlMode(TalonControlMode.Follower);
 		// leftFollower.set(LEFT_INDEX);
 		
