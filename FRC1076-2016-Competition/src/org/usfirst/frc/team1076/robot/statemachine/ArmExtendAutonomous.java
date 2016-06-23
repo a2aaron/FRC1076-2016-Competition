@@ -38,15 +38,14 @@ public class ArmExtendAutonomous extends AutoState {
 	public double armExtendSpeed() {
 		if (shouldChange()) {
 			return 0;
-		} else {
-			switch (extendDirection) {
-			case Forwards:
-				return speed;
-			case Backwards:
-				return -speed;
-			default:
-				return 0;
-			}
+		}
+		switch (extendDirection) {
+		case Forwards:
+		    return speed;
+		case Backwards:
+		    return -speed;
+		default:
+		    return 0;
 		}
 	}
 }
