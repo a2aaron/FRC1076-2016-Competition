@@ -35,7 +35,11 @@ public abstract class AutoState {
 	public double armSpeed() {
 		return 0;
 	}
-	
+
+	public double armExtendSpeed() {
+		return 0;
+	}
+
 	public double intakeSpeed() {
 		return 0;
 	}
