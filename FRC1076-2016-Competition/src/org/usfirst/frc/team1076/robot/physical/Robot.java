@@ -79,7 +79,8 @@ public class Robot extends IterativeRobot implements IRobot {
 	
 	double robotSpeed = 1;
 	double intakeSpeed = 1;
-	double armSpeed = 0.5;
+	double armUpSpeed = 0.50;
+	double armDownSpeed = 0.25;
 	double armExtendSpeed = 1;
 	double upperGearThreshold = 0.6;
 	double lowerGearThreshold = 0.4;
@@ -317,8 +318,13 @@ public class Robot extends IterativeRobot implements IRobot {
 	
 	@Override
 	public void setArmSpeed(double speed) {
-		armMotor.set(speed * armSpeed);
-		armFollower.set(speed * armSpeed);
+		if (speed > 0) {
+			armMotor.set(speed * armUpSpeed);
+			armFollower.set(speed * armUpSpeed);
+		} else {
+			armMotor.set(speed * armDownSpeed);
+			armFollower.set(speed * armDownSpeed);
+		}
 	}
 	
 	@Override
