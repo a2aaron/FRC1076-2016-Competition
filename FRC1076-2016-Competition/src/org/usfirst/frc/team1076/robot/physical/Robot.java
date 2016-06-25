@@ -51,8 +51,8 @@ public class Robot extends IterativeRobot implements IRobot {
 	static final int RIGHT_FOLLOWER_INDEX = 2;
 	static final int INTAKE_INDEX = 5;
 	// None of the below indexes are correct.
-	static final int ARM_EXTEND_INDEX = 6;
-	static final int ARM_EXTEND_FOLLOWER_INDEX = 9;
+	static final int ARM_EXTEND_INDEX = 9;
+	static final int ARM_EXTEND_FOLLOWER_INDEX = 6;
 	static final int ARM_INDEX = 7;
 	static final int ARM_FOLLOWER_INDEX = 8;
 	double MOTOR_POWER_FACTOR = 0.9;
@@ -142,6 +142,9 @@ public class Robot extends IterativeRobot implements IRobot {
 		armExtendFollower.ConfigFwdLimitSwitchNormallyOpen(true);
 		armExtendFollower.ConfigRevLimitSwitchNormallyOpen(true);
 		armExtendFollower.enableLimitSwitch(true, true);
+		
+		armExtendFollower.changeControlMode(CANTalon.TalonControlMode.Follower);
+		armExtendFollower.set(ARM_EXTEND_INDEX);
 //		System.out.println("Enabled all limit switches");
 		// leftFollower.changeControlMode(TalonControlMode.Follower);
 		// leftFollower.set(LEFT_INDEX);
