@@ -130,26 +130,27 @@ public class Robot extends IterativeRobot implements IRobot {
 		armExtendFollower.enableBrakeMode(true);
 
 		
-		armMotor.ConfigFwdLimitSwitchNormallyOpen(true);
-		armMotor.ConfigRevLimitSwitchNormallyOpen(true);
-		armMotor.enableLimitSwitch(true, true);
-		armFollower.ConfigFwdLimitSwitchNormallyOpen(true);
-		armFollower.ConfigRevLimitSwitchNormallyOpen(true);
-		armFollower.enableLimitSwitch(true, true);
+//		armMotor.ConfigFwdLimitSwitchNormallyOpen(true);
+//		armMotor.ConfigRevLimitSwitchNormallyOpen(true);
+//		armMotor.enableLimitSwitch(true, true);
+//		armFollower.ConfigFwdLimitSwitchNormallyOpen(true);
+//		armFollower.ConfigRevLimitSwitchNormallyOpen(true);
+//		armFollower.enableLimitSwitch(true, true);
 		armExtendMotor.ConfigFwdLimitSwitchNormallyOpen(true);
 		armExtendMotor.ConfigRevLimitSwitchNormallyOpen(true);
 		armExtendMotor.enableLimitSwitch(true, true);
 		armExtendFollower.ConfigFwdLimitSwitchNormallyOpen(true);
 		armExtendFollower.ConfigRevLimitSwitchNormallyOpen(true);
 		armExtendFollower.enableLimitSwitch(true, true);
+//		System.out.println("Enabled all limit switches");
 		// leftFollower.changeControlMode(TalonControlMode.Follower);
 		// leftFollower.set(LEFT_INDEX);
 		
 		compressor.setClosedLoopControl(true);
 		setIntakeElevation(IntakeRaiseState.Raised);
-		gearShifter.shiftLow(this);
 		
 		IGamepad driverGamepad = new Gamepad(0);
+		gearShifter.shiftLow(this);
 		IGamepad operatorGamepad = new Gamepad(1);
 		IDriverInput tank = new TankInput(driverGamepad);
 		IDriverInput arcade = new ArcadeInput(driverGamepad);
@@ -177,8 +178,8 @@ public class Robot extends IterativeRobot implements IRobot {
     public void autonomousInit() {
 	    // Setting the limit switch to be normally closed
 	    // ensures that the motors will disable if the limit switches break.
-	    armMotor.ConfigFwdLimitSwitchNormallyOpen(false);
-	    armFollower.ConfigFwdLimitSwitchNormallyOpen(false);
+//	    armMotor.ConfigFwdLimitSwitchNormallyOpen(false);
+//	    armFollower.ConfigFwdLimitSwitchNormallyOpen(false);
 
 		sensorData.sendAttackColor("tegra-ubuntu:5888", SmartDashboard.getString("Enemy Color"));
 		
@@ -236,8 +237,8 @@ public class Robot extends IterativeRobot implements IRobot {
         // Setting the limit switches to be normally open
         // ensures the motor always works even when the limit switch
         // does not work. Note that this will cause a brief disabling of the arm.
-        armMotor.ConfigFwdLimitSwitchNormallyOpen(true);
-        armFollower.ConfigFwdLimitSwitchNormallyOpen(true);
+//        armMotor.ConfigFwdLimitSwitchNormallyOpen(true);
+//        armFollower.ConfigFwdLimitSwitchNormallyOpen(true);
 
     	lidarMotorSpeed = SmartDashboard.getNumber("Initial Lidar Speed");
     	
