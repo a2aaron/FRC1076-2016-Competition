@@ -154,7 +154,7 @@ public class Robot extends IterativeRobot implements IRobot {
 		// leftFollower.set(LEFT_INDEX);
 		
 		compressor.setClosedLoopControl(true);
-		setIntakeElevation(IntakeRaiseState.Raised);
+		setIntakeElevation(IntakeRaiseState.Lowered); //TODO: the lable for lowered and raised is swaped incorrectly!
 		
 		IGamepad driverGamepad = new Gamepad(0);
 		gearShifter.shiftLow(this);
