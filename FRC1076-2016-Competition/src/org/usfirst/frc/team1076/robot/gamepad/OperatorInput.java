@@ -42,4 +42,10 @@ public class OperatorInput implements IOperatorInput {
 		}		
 		return IntakeRaiseState.Neutral;
 	}
+
+	@Override
+	public boolean operatorTurbo() {
+		return gamepad.getButton(GamepadButton.B);
+	}
 }
+

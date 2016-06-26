@@ -37,6 +37,8 @@ public class TeleopController implements IRobotController {
 	public void teleopPeriodic(IRobot robot) {
 		if (driverInput.turboArm()) {
 			robot.setArmSpeed(operatorInput.armSpeed(), true);
+		} else if (operatorInput.operatorTurbo()){
+			robot.setArmSpeed(operatorInput.armSpeed(), false, true);
 		} else {
 			robot.setArmSpeed(operatorInput.armSpeed(), false);
 		}

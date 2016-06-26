@@ -8,4 +8,5 @@ public interface IOperatorInput {
 	
 	double armExtendSpeed();
 	double armSpeed();
+	boolean operatorTurbo();
 }
