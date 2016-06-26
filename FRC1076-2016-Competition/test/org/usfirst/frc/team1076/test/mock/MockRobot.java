@@ -67,5 +67,17 @@ public class MockRobot implements IRobot {
 	public void setArmExtendSpeed(double speed) {
 		this.extend = speed;
 	}
+	// Should the two below do anything?
+    @Override
+    public void setArmSpeed(double speed, boolean turbo) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void setArmSpeed(double speed, boolean turbo, boolean operatorTurbo) {
+        // TODO Auto-generated method stub
+        
+    }
 
 }

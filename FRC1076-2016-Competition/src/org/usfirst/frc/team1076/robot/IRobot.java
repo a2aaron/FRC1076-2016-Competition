@@ -17,4 +17,5 @@ public interface IRobot {
 	void setGear(SolenoidValue value);
 	MotorOutput getMotorSpeed();
 	void setArmSpeed(double speed, boolean turbo);
+	void setArmSpeed(double speed, boolean turbo, boolean operatorTurbo);
 }

@@ -18,6 +18,7 @@ import org.usfirst.frc.team1076.robot.gamepad.TankInput;
 import org.usfirst.frc.team1076.robot.sensors.DistanceEncoder;
 import org.usfirst.frc.team1076.robot.sensors.IDistanceEncoder;
 import org.usfirst.frc.team1076.robot.statemachine.ArmAutonomous;
+import org.usfirst.frc.team1076.robot.statemachine.ArmAutonomous.LiftDirection;
 import org.usfirst.frc.team1076.robot.statemachine.AutoState;
 import org.usfirst.frc.team1076.robot.statemachine.ForwardAutonomous;
 import org.usfirst.frc.team1076.robot.statemachine.IntakeAutonomous;
@@ -82,7 +83,8 @@ public class Robot extends IterativeRobot implements IRobot {
 	double armUpSpeed = 0.4;
 	double armDownSpeed = 0.23;
 	double armExtendSpeed = 1;
-	double turboSpeed = 1;
+	double driverTurboSpeed = 1;
+	double operatorTurboSpeed = 0.75;
 	double upperGearThreshold = 0.6;
 	double lowerGearThreshold = 0.4;
 	
@@ -197,7 +199,10 @@ public class Robot extends IterativeRobot implements IRobot {
 		} else {
 			autoDriveDistance = SmartDashboard.getNumber("Distance");
 			lidarMotorSpeed = SmartDashboard.getNumber("Initial Lidar Speed");
-			autoController = new AutoController(new ForwardAutonomous(7000, 0.75)); //TODO: investigate forwards backwards stuff.
+			
+			autoController = new AutoController(new ForwardAutonomous(7000, 0.75)
+												.addNext(new ArmAutonomous(100, 0.5, LiftDirection.Down))); 
+												//TODO: investigate forwards backwards stuff.
 //			autoController = new AutoController
 //					new ForwardAutonomous(600, -0.5)
 //					.addNext(new RotateAutonomous(320, -1, RotateAutonomous.TurnDirection.Left))
@@ -211,7 +216,7 @@ public class Robot extends IterativeRobot implements IRobot {
 		/*
 		if (SmartDashboard.getBoolean("Low Bar")) {
 			autoController = new AutoController(new IntakeElevationAutonomous(IntakeRaiseState.Lowered)
-					.addNext(new ForwardA`utonomous(6000, -0.6)));
+					.addNext(new ForwardAutonomous(6000, -0.6)));
 		} else if (SmartDashboard.getBoolean("Backwards")) {
 			autoController = new AutoController(new ForwardAutonomous(6000, 0.6));
 		}
@@ -319,19 +324,29 @@ public class Robot extends IterativeRobot implements IRobot {
 		rightFollower.set(speed * robotSpeed);
 	}
 	@Override
-	public void setArmSpeed(double speed, boolean turbo) {
+	public void setArmSpeed(double speed, boolean turbo, boolean operatorTurbo) {
+		//TODO: 50% speed on arm if operator b button pressed.
+		//Driver precednece
 		if (speed < 0) {
 			armMotor.set(speed * armUpSpeed);
 			armFollower.set(speed * armUpSpeed);
 		} else {
 			if (turbo) {
-				armMotor.set(speed * turboSpeed);
-				armFollower.set(speed * turboSpeed);
+				armMotor.set(speed * driverTurboSpeed);
+				armFollower.set(speed * driverTurboSpeed);
+			} else if (operatorTurbo) {
+				armMotor.set(speed * operatorTurboSpeed);
+				armFollower.set(speed * operatorTurboSpeed);
 			} else {
 			armMotor.set(speed * armDownSpeed);
 			armFollower.set(speed * armDownSpeed);
+			}
 		}
 	}
+	
+	@Override
+	public void setArmSpeed(double speed, boolean turbo) {
+		setArmSpeed(speed, turbo, false);
 	}
 
 	@Override
