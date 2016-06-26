@@ -35,7 +35,11 @@ public class TeleopController implements IRobotController {
 	
 	@Override
 	public void teleopPeriodic(IRobot robot) {
-		robot.setArmSpeed(operatorInput.armSpeed());
+		if (driverInput.turboArm()) {
+			robot.setArmSpeed(operatorInput.armSpeed(), true);
+		} else {
+			robot.setArmSpeed(operatorInput.armSpeed(), false);
+		}
 		robot.setArmExtendSpeed(operatorInput.armExtendSpeed());
 		robot.setIntakeSpeed(operatorInput.intakeSpeed());
 		robot.setIntakeElevation(operatorInput.intakeRaiseState());
@@ -55,7 +59,6 @@ public class TeleopController implements IRobotController {
 		default:
 			break;
 		}
-
     	if (driverInput.shiftHigh()) {
     		gearShifter.shiftHigh(robot);
     	} else if (driverInput.shiftLow()) {

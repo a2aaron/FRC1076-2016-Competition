@@ -17,7 +17,7 @@ public class OperatorInput implements IOperatorInput {
 
 	@Override
 	public double armExtendSpeed() {
-		return gamepad.getAxis(GamepadAxis.LeftY);
+		return -gamepad.getAxis(GamepadAxis.LeftY);
 	}
 	
 	@Override

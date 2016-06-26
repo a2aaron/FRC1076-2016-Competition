@@ -42,4 +42,9 @@ public class TankInput implements IDriverInput {
 			return ControlSide.Current;
 		}
 	}
+	
+	public boolean turboArm() {
+		System.out.println("Turbo enabled!");
+		return gamepad.getButton(GamepadButton.B);
+	}
 }
