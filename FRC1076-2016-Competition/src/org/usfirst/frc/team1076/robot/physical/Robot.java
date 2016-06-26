@@ -115,11 +115,11 @@ public class Robot extends IterativeRobot implements IRobot {
 		SmartDashboard.putNumber("Distance", autoDriveDistance);
 		SmartDashboard.putNumber("Initial Lidar Speed", initialLidarSpeed);
     	SmartDashboard.putBoolean("Auto Program Enabled", false);
-    	SmartDashboard.putString("Auto Program", "elevate up ; forward 3.9 0.65 ; elevate down ;"
-    			+ "forward 0.6 0.5 ; rotate left 0.3 ; forward 3.5 ; rotate right 0.59 ;"
-    			+ "vision 2.5 0.45 ; intake 1 out ; intake 0.5 in ; rotate right 0.05 ;"
-    			+ "intake 1 out ; intake 0.5 in ; rotate right 0.05 ; intake 1 out");
-
+    	//SmartDashboard.putString("Auto Program", "elevate up ; forward 3.9 0.65 ; elevate down ;"
+    	//		+ "forward 0.6 0.5 ; rotate left 0.3 ; forward 3.5 ; rotate right 0.59 ;"
+    	//		+ "vision 2.5 0.45 ; intake 1 out ; intake 0.5 in ; rotate right 0.05 ;"
+    	//		+ "intake 1 out ; intake 0.5 in ; rotate right 0.05 ; intake 1 out");
+    	SmartDashboard.putString("Auto Program", "nothing");
 		// Initialize the physical components before the controllers,
 		// in case they depend on them.
 		// rightFollower.changeControlMode(TalonControlMode.Follower);
@@ -190,27 +190,28 @@ public class Robot extends IterativeRobot implements IRobot {
 
 		sensorData.sendAttackColor("tegra-ubuntu:5888", SmartDashboard.getString("Enemy Color"));
 		
-		if (SmartDashboard.getBoolean("Auto Program Enabled")) {
+		if (false && SmartDashboard.getBoolean("Auto Program Enabled")) {
 			String source = SmartDashboard.getString("Auto Program");
 			AutoState program = StateMachineCompiler.compile(source, sensorData);
 			autoController = new AutoController(program);
 		} else {
 			autoDriveDistance = SmartDashboard.getNumber("Distance");
 			lidarMotorSpeed = SmartDashboard.getNumber("Initial Lidar Speed");
-			autoController = new AutoController(
-					new ForwardAutonomous(600, -0.5)
-					.addNext(new RotateAutonomous(320, -1, RotateAutonomous.TurnDirection.Left))
-					.addNext(new ForwardAutonomous(4100, -0.5))
-					.addNext(new RotateAutonomous(750, -1, RotateAutonomous.TurnDirection.Right))
-					.addNext(new VisionAutonomous(1500, -0.7, sensorData))
-					.addNext(new IntakeAutonomous(1500, -1))
-					.addNext(new IntakeAutonomous(1000, 1))
-					.addNext(new IntakeAutonomous(1500, -1)));
+			autoController = new AutoController(new ForwardAutonomous(7000, 0.75)); //TODO: investigate forwards backwards stuff.
+//			autoController = new AutoController
+//					new ForwardAutonomous(600, -0.5)
+//					.addNext(new RotateAutonomous(320, -1, RotateAutonomous.TurnDirection.Left))
+//					.addNext(new ForwardAutonomous(4100, -0.5))
+//					.addNext(new RotateAutonomous(750, -1, RotateAutonomous.TurnDirection.Right))
+//					.addNext(new VisionAutonomous(1500, -0.7, sensorData))
+//					.addNext(new IntakeAutonomous(1500, -1))
+//					.addNext(new IntakeAutonomous(1000, 1))
+//					.addNext(new IntakeAutonomous(1500, -1)));
 		}
 		/*
 		if (SmartDashboard.getBoolean("Low Bar")) {
 			autoController = new AutoController(new IntakeElevationAutonomous(IntakeRaiseState.Lowered)
-					.addNext(new ForwardAutonomous(6000, -0.6)));
+					.addNext(new ForwardA`utonomous(6000, -0.6)));
 		} else if (SmartDashboard.getBoolean("Backwards")) {
 			autoController = new AutoController(new ForwardAutonomous(6000, 0.6));
 		}
