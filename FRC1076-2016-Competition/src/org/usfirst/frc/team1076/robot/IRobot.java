@@ -16,4 +16,5 @@ public interface IRobot {
 	ISensorData getSensorData(); 
 	void setGear(SolenoidValue value);
 	MotorOutput getMotorSpeed();
+	void setArmSpeed(double speed, boolean turbo);
 }

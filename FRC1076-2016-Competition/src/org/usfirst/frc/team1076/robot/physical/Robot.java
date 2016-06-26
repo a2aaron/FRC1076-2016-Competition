@@ -79,9 +79,10 @@ public class Robot extends IterativeRobot implements IRobot {
 	
 	double robotSpeed = 1;
 	double intakeSpeed = 1;
-	double armUpSpeed = 0.50;
-	double armDownSpeed = 0.25;
+	double armUpSpeed = 0.4;
+	double armDownSpeed = 0.23;
 	double armExtendSpeed = 1;
+	double turboSpeed = 1;
 	double upperGearThreshold = 0.6;
 	double lowerGearThreshold = 0.4;
 	
@@ -125,6 +126,8 @@ public class Robot extends IterativeRobot implements IRobot {
 		// rightFollower.set(RIGHT_INDEX);
 		leftFollower.setInverted(true);
 		leftMotor.setInverted(true);
+//		armExtendMotor.setInverted(false);
+//		armExtendMotor.setInverted(false); //NO changes
 		armMotor.enableBrakeMode(true);
 		armFollower.enableBrakeMode(true);
 		armExtendMotor.enableBrakeMode(true);
@@ -195,8 +198,7 @@ public class Robot extends IterativeRobot implements IRobot {
 			autoDriveDistance = SmartDashboard.getNumber("Distance");
 			lidarMotorSpeed = SmartDashboard.getNumber("Initial Lidar Speed");
 			autoController = new AutoController(
-			        new ArmAutonomous(1000, ArmAutonomous.LiftDirection.Down)
-					.addNext(new ForwardAutonomous(600, -0.5))
+					new ForwardAutonomous(600, -0.5)
 					.addNext(new RotateAutonomous(320, -1, RotateAutonomous.TurnDirection.Left))
 					.addNext(new ForwardAutonomous(4100, -0.5))
 					.addNext(new RotateAutonomous(750, -1, RotateAutonomous.TurnDirection.Right))
@@ -315,16 +317,25 @@ public class Robot extends IterativeRobot implements IRobot {
 		rightMotor.set(speed * robotSpeed);
 		rightFollower.set(speed * robotSpeed);
 	}
-	
 	@Override
-	public void setArmSpeed(double speed) {
-		if (speed > 0) {
+	public void setArmSpeed(double speed, boolean turbo) {
+		if (speed < 0) {
 			armMotor.set(speed * armUpSpeed);
 			armFollower.set(speed * armUpSpeed);
 		} else {
+			if (turbo) {
+				armMotor.set(speed * turboSpeed);
+				armFollower.set(speed * turboSpeed);
+			} else {
 			armMotor.set(speed * armDownSpeed);
 			armFollower.set(speed * armDownSpeed);
 		}
+	}
+	}
+
+	@Override
+	public void setArmSpeed(double speed) {
+		setArmSpeed(speed, false);
 	}
 	
 	@Override
