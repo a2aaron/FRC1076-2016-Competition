@@ -49,7 +49,6 @@ public class ArcadeInput implements IDriverInput {
 	}
 
 	public boolean turboArm() {
-		System.out.println("Turbo enabled! (Arcade)");
 		return gamepad.getButton(GamepadButton.B);
 	}
 }
