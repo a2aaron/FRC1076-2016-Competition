@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.util.LinkedList;
 
 import org.usfirst.frc.team1076.robot.gamepad.IDriverInput;
 import org.usfirst.frc.team1076.robot.gamepad.IOperatorInput;
@@ -24,9 +25,14 @@ public class RecordController {
     long startTime;
     String fileName;
     // Contain all of the data about each controller.
-    Object[] driverFrame;
-    Object[] operatorFrame;
+    // driveTrain, brakes, shiftLow, shiftHigh, turboArm
+    Object[] driverFrame = new Object[5];
+    // intakeSpeed, intakeRaise, armSpeed, armExtendSpeed, operatorTurbo
+    Object[] operatorFrame = new Object[5];
 
+    LinkedList<Object[]> frames;
+
+    boolean isRecording = false;
     public RecordController(String fileName, IDriverInput driverInput, IOperatorInput operatorInput) {
         this.driverInput = driverInput;
         this.operatorInput = operatorInput;
@@ -40,55 +46,49 @@ public class RecordController {
 
     public void startRecording() {
         startTime = System.currentTimeMillis();
-        try {
-            ois.writeChars(fileName);
-            ois.writeLong(startTime);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        isRecording = true;
     }
 
     public void recordFrame() {
-        long deltaTime = System.currentTimeMillis() - startTime;
-        getDriverFrame();
-        getOperatorFrame();
-
-        try {
-            ois.writeObject(new Object[] {deltaTime,
-                                          driverFrame,
-                                          operatorFrame});
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        if(isRecording) {
+            long deltaTime = System.currentTimeMillis() - startTime;
+            getDriverFrame();
+            getOperatorFrame();
+            Object[] frame = new Object[]{deltaTime, driverFrame, operatorFrame};
+            frames.addLast(frame);
+        } else {
+            throw new RuntimeException("Not recording! (call startRecording())");
         }
     }
 
     public void getDriverFrame() {
-        driverFrame = new Object[]{
-                driverInput.driveTrainSpeed(),
-                driverInput.brakesApplied(),
-                driverInput.shiftLow(),
-                driverInput.shiftHigh(),
-                driverInput.turboArm()
-        };
+        driverFrame[0] = driverInput.driveTrainSpeed();
+        driverFrame[1] = driverInput.brakesApplied();
+        driverFrame[2] = driverInput.shiftLow();
+        driverFrame[3] = driverInput.shiftHigh();
+        driverFrame[4] = driverInput.turboArm();
     }
 
     public void getOperatorFrame() {
-        operatorFrame = new Object[]{
-                operatorInput.intakeSpeed(),
-                operatorInput.intakeRaiseState(),
-                operatorInput.armSpeed(),
-                operatorInput.armExtendSpeed(),
-                operatorInput.turboArm()
-        };
+        operatorFrame[0] = operatorInput.intakeSpeed();
+        operatorFrame[1] = operatorInput.intakeRaiseState();
+        operatorFrame[2] = operatorInput.armSpeed();
+        operatorFrame[3] = operatorInput.armExtendSpeed();
+        operatorFrame[4] = operatorInput.turboArm();
     }
 
     public void stopRecording() {
         try {
+            ois.writeObject(frames);
             ois.close();
+            isRecording = false;
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+    }
+
+    public boolean isRecording() {
+        return isRecording;
     }
 }

@@ -5,6 +5,7 @@ import org.usfirst.frc.team1076.robot.ISolenoid;
 import org.usfirst.frc.team1076.robot.IRobot;
 import org.usfirst.frc.team1076.robot.controllers.AutoController;
 import org.usfirst.frc.team1076.robot.controllers.IRobotController;
+import org.usfirst.frc.team1076.robot.controllers.RecordController;
 import org.usfirst.frc.team1076.robot.controllers.TeleopController;
 import org.usfirst.frc.team1076.robot.controllers.TestController;
 import org.usfirst.frc.team1076.robot.gamepad.ArcadeInput;
@@ -51,7 +52,6 @@ public class Robot extends IterativeRobot implements IRobot {
 	static final int RIGHT_INDEX = 1;
 	static final int RIGHT_FOLLOWER_INDEX = 2;
 	static final int INTAKE_INDEX = 5;
-	// None of the below indexes are correct.
 	static final int ARM_EXTEND_INDEX = 9;
 	static final int ARM_EXTEND_FOLLOWER_INDEX = 6;
 	static final int ARM_INDEX = 7;
@@ -77,6 +77,10 @@ public class Robot extends IterativeRobot implements IRobot {
 	IRobotController teleopController;
 	IRobotController autoController;
 	IRobotController testController;
+
+	RecordController recordController;
+	// Makes test mode record when true.
+	boolean recordingInTest = true;
 	
 	double robotSpeed = 1;
 	double intakeSpeed = 1;
@@ -171,6 +175,7 @@ public class Robot extends IterativeRobot implements IRobot {
 		encoder = new DistanceEncoder(new MotorEncoder(leftMotor), gearShifter);
 		autoController = new AutoController(new NothingAutonomous());
 		testController = new TestController(driverGamepad);
+		recordController = new RecordController("recording", tank, operator);
 		
 		IChannel channel = new Channel(5880);
 		sensorData = new SensorData(channel, FieldPosition.Right, new Gyro(new AnalogGyro(0)));
@@ -281,7 +286,9 @@ public class Robot extends IterativeRobot implements IRobot {
     
     @Override
     public void testInit() {
-    	if (testController != null) {
+        if (recordingInTest) {
+            recordInit();
+        } else if (testController != null) {
     		testController.testPeriodic(this);
     	} else {
     		System.err.println("Test Controller on Robot is null in testInit()");
@@ -291,8 +298,9 @@ public class Robot extends IterativeRobot implements IRobot {
     @Override
     public void testPeriodic() {
     	commonPeriodic();
-    	
-    	if (testController != null) {
+    	if (recordingInTest) {
+    	    recordPeriodic();
+    	} else if (testController != null) {
     		testController.testPeriodic(this);
     	} else {
     		System.err.println("Test Controller on Robot is null in testInit()");
@@ -313,8 +321,21 @@ public class Robot extends IterativeRobot implements IRobot {
     @Override
     public void disabledPeriodic() {
     	commonPeriodic();
+    	if (recordController.isRecording()) {
+    	    recordController.stopRecording();
+    	}
+    }
+
+    public void recordInit() {
+        teleopInit();
+        recordController.startRecording();
     }
     
+    public void recordPeriodic() {
+        teleopPeriodic();
+        recordController.recordFrame();
+    }
+
 	@Override
 	public void setLeftSpeed(double speed) {
 		leftFollower.set(speed * MOTOR_POWER_FACTOR * robotSpeed);
