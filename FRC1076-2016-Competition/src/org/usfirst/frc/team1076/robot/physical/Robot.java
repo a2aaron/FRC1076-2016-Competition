@@ -323,11 +323,20 @@ public class Robot extends IterativeRobot implements IRobot {
 		rightMotor.set(speed * robotSpeed);
 		rightFollower.set(speed * robotSpeed);
 	}
+
 	@Override
 	public void setArmSpeed(double speed, boolean turbo, boolean operatorTurbo) {
-		//TODO: 50% speed on arm if operator b button pressed.
-		//Driver precednece
-		if (speed < 0) {
+	    /**
+	     Turbo mode increases the power going to the lift arm. This allows
+	     the arm to recover from moving too far forwards. The driver has a full
+	     power turbo while the operator has a 75% turbo. The driver takes precedence.
+	     The turbo mode only applies when lowering the lift arm.
+
+	     Note that the raising and lowering of the arm differ in speed even
+	     when not in any turbo mode. Lowering is less powerful due to gravity
+	     helping. This difference can not be turned off.
+	     */
+		if (speed > 0) {
 			armMotor.set(speed * armUpSpeed);
 			armFollower.set(speed * armUpSpeed);
 		} else {
@@ -338,22 +347,24 @@ public class Robot extends IterativeRobot implements IRobot {
 				armMotor.set(speed * operatorTurboSpeed);
 				armFollower.set(speed * operatorTurboSpeed);
 			} else {
-			armMotor.set(speed * armDownSpeed);
-			armFollower.set(speed * armDownSpeed);
+			    armMotor.set(speed * armDownSpeed);
+			    armFollower.set(speed * armDownSpeed);
 			}
 		}
 	}
-	
+
+	// Driver turbo mode.
 	@Override
 	public void setArmSpeed(double speed, boolean turbo) {
 		setArmSpeed(speed, turbo, false);
 	}
 
+	// Standard lift arm speed.
 	@Override
 	public void setArmSpeed(double speed) {
 		setArmSpeed(speed, false);
 	}
-	
+
 	@Override
 	public void setArmExtendSpeed(double speed) {
 		armExtendMotor.set(speed * armExtendSpeed);
@@ -434,4 +445,24 @@ public class Robot extends IterativeRobot implements IRobot {
 	    }
 	    setLidarSpeed(lidarMotorSpeed);
 	}
+	
+	@Override
+	public double getArmDownSpeed() {
+	    return armDownSpeed;
+	}
+
+    @Override
+    public double getArmUpSpeed() {
+        return armUpSpeed;
+    }
+
+    @Override
+    public double getArmTurboSpeed() {
+        return driverTurboSpeed;
+    }
+
+    @Override
+    public double getArmOperatorTurboSpeed() {
+        return operatorTurboSpeed;
+    }
 }
