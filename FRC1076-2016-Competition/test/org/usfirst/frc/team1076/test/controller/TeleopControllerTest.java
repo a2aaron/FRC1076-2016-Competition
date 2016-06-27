@@ -39,16 +39,66 @@ public class TeleopControllerTest {
 	}
 	
 	@Test
-	public void testArmMotion() {
-		for (int i = -100; i <= 100; i++) {
-			double value = i / 100.0;
-			operatorInput.arm = value;
-			controller.teleopPeriodic(robot);
-			assertEquals("The arm motion should match the arm input",
-					value, robot.arm, EPSILON);
-		}
+	public void testUpArmMotion() {
+	    for (int i = 0; i <= 100; i++) {
+	        robot.armUpSpeed = 0.5;
+	        double value = i / 100.0;
+	        operatorInput.arm = value;
+	        controller.teleopPeriodic(robot);
+	        double expected =  value * robot.armUpSpeed;
+	        assertEquals("The arm motion should be the arm input " +
+	                     "reduced by a factor of " + robot.armUpSpeed,
+	                     expected, robot.arm, EPSILON);
+	    }
 	}
 	
+	@Test
+	public void testDownArmMotion() {
+	    for (int i = -100; i <= 0; i++) {
+	        robot.armDownSpeed = 0.5;
+	        double value = i / 100.0;
+	        operatorInput.arm = value;
+	        controller.teleopPeriodic(robot);
+	        double expected =  value * robot.armDownSpeed;
+
+	        assertEquals("The arm motion should be the arm input "
+	                + "reduced by a factor of " + robot.armDownSpeed,
+	                expected, robot.arm, EPSILON);
+	    }
+	}
+
+	@Test
+	public void testDriverTurboArmMotion() {
+	    for (int i = -100; i <= 0; i++) {
+	        robot.driverTurboSpeed = 0.9;
+	        double value = i / 100.0;
+	        operatorInput.arm = value;
+	        driverInput.turboArm = true;
+	        controller.teleopPeriodic(robot);
+	        double expected =  value * robot.driverTurboSpeed;
+
+	        assertEquals("The arm motion should be the arm input "
+	                + "multiplied by a factor of " + robot.driverTurboSpeed,
+	                expected, robot.arm, EPSILON);
+	    }
+	}
+
+    @Test
+    public void testOperatorTurboArmMotion() {
+        for (int i = -100; i <= 0; i++) {
+            robot.operatorTurboSpeed = 0.75;
+            double value = i / 100.0;
+            operatorInput.arm = value;
+            operatorInput.operatorTurbo = true;
+            controller.teleopPeriodic(robot);
+            double expected =  value * robot.operatorTurboSpeed;
+
+            assertEquals("The arm motion should be the arm input "
+                    + "multiplied by a factor of " + robot.operatorTurboSpeed,
+                    expected, robot.arm, EPSILON);
+        }
+    }
+
 	@Test
 	public void testArmExtension() {
 		for (int i = -100; i <= 100; i++) {

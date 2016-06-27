@@ -18,4 +18,8 @@ public interface IRobot {
 	MotorOutput getMotorSpeed();
 	void setArmSpeed(double speed, boolean turbo);
 	void setArmSpeed(double speed, boolean turbo, boolean operatorTurbo);
+    double getArmDownSpeed();
+    double getArmUpSpeed();
+    double getArmTurboSpeed();
+    double getArmOperatorTurboSpeed();
 }
