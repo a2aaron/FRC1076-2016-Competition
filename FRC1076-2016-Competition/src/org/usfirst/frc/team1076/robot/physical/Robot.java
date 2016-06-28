@@ -80,11 +80,11 @@ public class Robot extends IterativeRobot implements IRobot {
 	
 	double robotSpeed = 1;
 	double intakeSpeed = 1;
-	double armUpSpeed = 0.4;
-	double armDownSpeed = 0.23;
+//	double armUpSpeed = 0.4;
+//	double armDownSpeed = 0.23;
 	double armExtendSpeed = 1;
-	double driverTurboSpeed = 1;
-	double operatorTurboSpeed = 0.75;
+//	double driverTurboSpeed = 1;
+//	double operatorTurboSpeed = 0.75;
 	double upperGearThreshold = 0.6;
 	double lowerGearThreshold = 0.4;
 	
@@ -325,44 +325,9 @@ public class Robot extends IterativeRobot implements IRobot {
 	}
 
 	@Override
-	public void setArmSpeed(double speed, boolean turbo, boolean operatorTurbo) {
-	    /**
-	     Turbo mode increases the power going to the lift arm. This allows
-	     the arm to recover from moving too far forwards. The driver has a full
-	     power turbo while the operator has a 75% turbo. The driver takes precedence.
-	     The turbo mode only applies when lowering the lift arm.
-
-	     Note that the raising and lowering of the arm differ in speed even
-	     when not in any turbo mode. Lowering is less powerful due to gravity
-	     helping. This difference can not be turned off.
-	     */
-		if (speed > 0) {
-			armMotor.set(speed * armUpSpeed);
-			armFollower.set(speed * armUpSpeed);
-		} else {
-			if (turbo) {
-				armMotor.set(speed * driverTurboSpeed);
-				armFollower.set(speed * driverTurboSpeed);
-			} else if (operatorTurbo) {
-				armMotor.set(speed * operatorTurboSpeed);
-				armFollower.set(speed * operatorTurboSpeed);
-			} else {
-			    armMotor.set(speed * armDownSpeed);
-			    armFollower.set(speed * armDownSpeed);
-			}
-		}
-	}
-
-	// Driver turbo mode.
-	@Override
-	public void setArmSpeed(double speed, boolean turbo) {
-		setArmSpeed(speed, turbo, false);
-	}
-
-	// Standard lift arm speed.
-	@Override
 	public void setArmSpeed(double speed) {
-		setArmSpeed(speed, false);
+		armMotor.set(speed);
+		armFollower.set(speed);
 	}
 
 	@Override
@@ -445,24 +410,4 @@ public class Robot extends IterativeRobot implements IRobot {
 	    }
 	    setLidarSpeed(lidarMotorSpeed);
 	}
-	
-	@Override
-	public double getArmDownSpeed() {
-	    return armDownSpeed;
-	}
-
-    @Override
-    public double getArmUpSpeed() {
-        return armUpSpeed;
-    }
-
-    @Override
-    public double getArmTurboSpeed() {
-        return driverTurboSpeed;
-    }
-
-    @Override
-    public double getArmOperatorTurboSpeed() {
-        return operatorTurboSpeed;
-    }
 }
