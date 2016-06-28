@@ -34,7 +34,7 @@ public class MockOperatorInput implements IOperatorInput {
 	}
 
     @Override
-    public boolean operatorTurbo() {
+    public boolean turboArm() {
         return operatorTurbo;
     }
 }

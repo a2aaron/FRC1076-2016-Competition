@@ -48,6 +48,7 @@ public class ArcadeInput implements IDriverInput {
 		}
 	}
 
+	@Override
 	public boolean turboArm() {
 		return gamepad.getButton(GamepadButton.B);
 	}

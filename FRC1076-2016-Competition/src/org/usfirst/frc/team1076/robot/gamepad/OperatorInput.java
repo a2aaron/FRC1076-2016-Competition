@@ -45,7 +45,7 @@ public class OperatorInput implements IOperatorInput {
 	}
 
 	@Override
-	public boolean operatorTurbo() {
+	public boolean turboArm() {
 		return gamepad.getButton(GamepadButton.B);
 	}
 }

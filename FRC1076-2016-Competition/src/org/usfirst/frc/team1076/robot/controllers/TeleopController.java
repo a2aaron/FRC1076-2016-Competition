@@ -56,7 +56,7 @@ public class TeleopController implements IRobotController {
 		} else {
 		    if (driverInput.turboArm()) {
                 robot.setArmSpeed(armSpeed * driverTurboSpeed);
-            } else if (operatorInput.operatorTurbo()) {
+            } else if (operatorInput.turboArm()) {
                 robot.setArmSpeed(armSpeed * operatorTurboSpeed);
             } else {
                 robot.setArmSpeed(armSpeed * armDownSpeed);
