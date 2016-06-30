@@ -111,4 +111,8 @@ public class TeleopController implements IRobotController {
     public double getArmDownSpeed() {
         return armDownSpeed;
     }
+
+    public boolean replayActivated() {
+        return operatorInput.replayButtonHeld();
+    }
 }

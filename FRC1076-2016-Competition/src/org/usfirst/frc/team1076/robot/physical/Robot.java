@@ -2,10 +2,14 @@
 package org.usfirst.frc.team1076.robot.physical;
 
 import org.usfirst.frc.team1076.robot.ISolenoid;
+
+import java.io.File;
+
 import org.usfirst.frc.team1076.robot.IRobot;
 import org.usfirst.frc.team1076.robot.controllers.AutoController;
 import org.usfirst.frc.team1076.robot.controllers.IRobotController;
 import org.usfirst.frc.team1076.robot.controllers.RecordController;
+import org.usfirst.frc.team1076.robot.controllers.ReplayController;
 import org.usfirst.frc.team1076.robot.controllers.TeleopController;
 import org.usfirst.frc.team1076.robot.controllers.TestController;
 import org.usfirst.frc.team1076.robot.gamepad.ArcadeInput;
@@ -15,6 +19,7 @@ import org.usfirst.frc.team1076.robot.gamepad.IGamepad;
 import org.usfirst.frc.team1076.robot.gamepad.IOperatorInput;
 import org.usfirst.frc.team1076.robot.gamepad.IOperatorInput.IntakeRaiseState;
 import org.usfirst.frc.team1076.robot.gamepad.OperatorInput;
+import org.usfirst.frc.team1076.robot.gamepad.ReplayInput;
 import org.usfirst.frc.team1076.robot.gamepad.TankInput;
 import org.usfirst.frc.team1076.robot.sensors.DistanceEncoder;
 import org.usfirst.frc.team1076.robot.sensors.IDistanceEncoder;
@@ -79,9 +84,11 @@ public class Robot extends IterativeRobot implements IRobot {
 	IRobotController testController;
 
 	RecordController recordController;
+	ReplayController replayController;
 	// Makes test mode record when true.
 	boolean recordingInTest = true;
-	
+	boolean replaying = false;
+
 	double robotSpeed = 1;
 	double intakeSpeed = 1;
 //	double armUpSpeed = 0.4;
@@ -171,12 +178,13 @@ public class Robot extends IterativeRobot implements IRobot {
 		IDriverInput tank = new TankInput(driverGamepad);
 		IDriverInput arcade = new ArcadeInput(driverGamepad);
 		IOperatorInput operator = new OperatorInput(operatorGamepad);
+		ReplayInput replay = new ReplayInput(new File("recording"));
 		teleopController = new TeleopController(tank, operator, tank, arcade);
 		encoder = new DistanceEncoder(new MotorEncoder(leftMotor), gearShifter);
 		autoController = new AutoController(new NothingAutonomous());
 		testController = new TestController(driverGamepad);
 		recordController = new RecordController("recording", tank, operator);
-		
+		replayController = new ReplayController(replay);
 		IChannel channel = new Channel(5880);
 		sensorData = new SensorData(channel, FieldPosition.Right, new Gyro(new AnalogGyro(0)));
 		// TODO: Figure out what analog input channel we'll be using.
@@ -261,7 +269,8 @@ public class Robot extends IterativeRobot implements IRobot {
 //        armFollower.ConfigFwdLimitSwitchNormallyOpen(true);
 
     	lidarMotorSpeed = SmartDashboard.getNumber("Initial Lidar Speed");
-    	
+        replaying = false;
+        replayController.replayInit(this);;
     	if (teleopController != null) {
     		teleopController.teleopInit(this);
     	} else {
@@ -276,8 +285,16 @@ public class Robot extends IterativeRobot implements IRobot {
     public void teleopPeriodic() {
     	controlLidarMotor();
     	commonPeriodic();
-    	
-    	if (teleopController != null) {
+    	if (teleopController.replayActivated()) {
+    	    replaying = true;
+    	}
+    	if (replaying) {
+    	    try {
+                replayController.replayPeriodic(this);
+            } catch (Exception e) {
+                replaying = false;
+            }
+    	} else if (teleopController != null) {
         	teleopController.teleopPeriodic(this);
         } else {
     		System.err.println("Teleop Controller on Robot is null in teleopPeriodic()");

@@ -35,11 +35,12 @@ public class ReplayInput implements IOperatorInput, IDriverInput{
         }
     }
 
-    public void getFrame() {
+    public void getFrame() throws Exception {
         if (frames.isEmpty()) {
             replaying = false;
             driverFrame = null;
             operatorFrame = null;
+            throw new Exception("Reached EOF");
         } else {
             replaying = true;
             Object[] frame = frames.getFirst();
@@ -112,5 +113,11 @@ public class ReplayInput implements IOperatorInput, IDriverInput{
     @Override @Deprecated
     public boolean turboArm() {
         return driverTurbo() || operatorTurbo();
+    }
+
+    // Never use this
+    @Override @Deprecated
+    public boolean replayButtonHeld() {
+        return false;
     }
 }

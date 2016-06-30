@@ -57,4 +57,10 @@ public class AutoController implements IRobotController {
 	public void testPeriodic(IRobot robot) {
 		// TODO Auto-generated method stub
 	}
+
+    @Override
+    public boolean replayActivated() {
+        // TODO Auto-generated method stub
+        return false;
+    }
 }
