@@ -56,22 +56,24 @@ public class ReplayInput implements IOperatorInput, IDriverInput{
     }
     @Override
     public MotorOutput driveTrainSpeed() {
-        return (MotorOutput) driverFrame[0];
+        double left = (double) driverFrame[0];
+        double right = (double) driverFrame[1];
+        return new MotorOutput(left, right);
     }
 
     @Override
     public boolean brakesApplied() {
-        return (boolean) driverFrame[1];
-    }
-
-    @Override
-    public boolean shiftHigh() {
         return (boolean) driverFrame[2];
     }
 
     @Override
-    public boolean shiftLow() {
+    public boolean shiftHigh() {
         return (boolean) driverFrame[3];
+    }
+
+    @Override
+    public boolean shiftLow() {
+        return (boolean) driverFrame[4];
     }
 
     @Override
@@ -82,7 +84,7 @@ public class ReplayInput implements IOperatorInput, IDriverInput{
     }
 
     public boolean driverTurbo() {
-        return (boolean) driverFrame[4];
+        return (boolean) driverFrame[5];
     }
 
     @Override

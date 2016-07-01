@@ -183,7 +183,7 @@ public class Robot extends IterativeRobot implements IRobot {
 		encoder = new DistanceEncoder(new MotorEncoder(leftMotor), gearShifter);
 		autoController = new AutoController(new NothingAutonomous());
 		testController = new TestController(driverGamepad);
-		recordController = new RecordController("recording", tank, operator);
+		recordController = new RecordController(new File("recording"), tank, operator);
 		replayController = new ReplayController(replay);
 		IChannel channel = new Channel(5880);
 		sensorData = new SensorData(channel, FieldPosition.Right, new Gyro(new AnalogGyro(0)));
