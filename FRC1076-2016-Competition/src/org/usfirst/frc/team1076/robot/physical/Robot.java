@@ -294,6 +294,7 @@ public class Robot extends IterativeRobot implements IRobot {
     	} else {
     		System.out.println("Teleop Controller on Robot is null in teleopInit()");
     	}
+        setArmPneumatic(ArmPneumaticState.On);
     }
     
     /**

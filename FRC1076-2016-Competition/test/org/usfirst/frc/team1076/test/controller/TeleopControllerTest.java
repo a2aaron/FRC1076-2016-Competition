@@ -145,6 +145,11 @@ public class TeleopControllerTest {
 	    assertEquals("Arm motion means pneumatic",
 	            ArmPneumaticState.Off, robot.armPneumaticState);
 	    
+	    operatorInput.arm = -1;
+	        controller.teleopPeriodic(robot);
+	        assertEquals("Arm motion means pneumatic",
+	                ArmPneumaticState.Off, robot.armPneumaticState);
+	    
 	    operatorInput.arm = 0;
         controller.teleopPeriodic(robot);
         assertEquals("No arm motion means no pneumatic",
