@@ -51,7 +51,7 @@ public class TeleopController implements IRobotController {
         helping. This difference can not be turned off.
         */
 	    double armSpeed = operatorInput.armSpeed();
-		if (armSpeed > 0) {
+		if (armSpeed < 0) {
 		    robot.setArmSpeed(armSpeed * armUpSpeed);
 		} else {
 		    if (driverInput.turboArm()) {

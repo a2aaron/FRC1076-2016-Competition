@@ -20,7 +20,7 @@ public class ArmAutonomousTest {
 		assertEquals(1.0, auto.armSpeed(), EPSILON);
 
 		try {
-			Thread.sleep(100);
+			Thread.sleep(200);
 		} catch (InterruptedException e) {
 		}
 

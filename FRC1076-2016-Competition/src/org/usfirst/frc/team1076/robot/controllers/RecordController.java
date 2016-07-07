@@ -6,7 +6,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.util.LinkedList;
 
 import org.usfirst.frc.team1076.robot.gamepad.IDriverInput;
@@ -24,13 +23,12 @@ public class RecordController {
     ObjectOutputStream ois;
     IDriverInput driverInput;
     IOperatorInput operatorInput;
-    long startTime;
     File file;
     // Contain all of the data about each controller.
     // driveTrain, brakes, shiftLow, shiftHigh, turboArm
-    Object[] driverFrame = new Object[6];
+    DriverFrame driverFrame;
     // intakeSpeed, intakeRaise, armSpeed, armExtendSpeed, operatorTurbo
-    Object[] operatorFrame = new Object[5];
+    OperatorFrame operatorFrame;
 
     LinkedList<RecordFrame> frames = new LinkedList<RecordFrame>();
 
@@ -38,22 +36,34 @@ public class RecordController {
     public RecordController(File file, IDriverInput driverInput, IOperatorInput operatorInput) {
         this.driverInput = driverInput;
         this.operatorInput = operatorInput;
+        if (file.exists() == false) {
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
         this.file = file;
-        // Appends to the file.
         try {
             this.ois = new ObjectOutputStream(new FileOutputStream(file));
-        } catch (FileNotFoundException e) {
-        } catch (IOException e) { }
+        } catch (Exception e) {
+            throw new RuntimeException(e.toString());
+        }
     }
 
     public void startRecording() {
-        startTime = System.currentTimeMillis();
+        try {
+            ois = new ObjectOutputStream(new FileOutputStream(file));
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         isRecording = true;
     }
 
     public void recordFrame() {
         if(isRecording) {
-            long deltaTime = System.currentTimeMillis() - startTime;
             getDriverFrame();
             getOperatorFrame();
             RecordFrame frame = new RecordFrame(driverFrame, operatorFrame);
@@ -64,48 +74,25 @@ public class RecordController {
     }
 
     public void getDriverFrame() {
-        driverFrame[0] = driverInput.driveTrainSpeed().left;
-        driverFrame[1] = driverInput.driveTrainSpeed().right;
-        driverFrame[2] = driverInput.brakesApplied();
-        driverFrame[3] = driverInput.shiftLow();
-        driverFrame[4] = driverInput.shiftHigh();
-        driverFrame[5] = driverInput.turboArm();
+        driverFrame = new DriverFrame(driverInput);
     }
 
     public void getOperatorFrame() {
-        operatorFrame[0] = operatorInput.intakeSpeed();
-        operatorFrame[1] = operatorInput.intakeRaiseState();
-        operatorFrame[2] = operatorInput.armSpeed();
-        operatorFrame[3] = operatorInput.armExtendSpeed();
-        operatorFrame[4] = operatorInput.turboArm();
+        operatorFrame = new OperatorFrame(operatorInput);
     }
 
     public void stopRecording() {
         try {
             ois.writeObject(frames);
+            ois.flush();
             ois.close();
             isRecording = false;
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
 
     public boolean isRecording() {
         return isRecording;
-    }
-}
-
-class RecordFrame implements Serializable {
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 6006282172422543098L;
-    Object[] driverFrame = new Object[5];
-    Object[] operatorFrame = new Object[5];
-    
-    public RecordFrame(Object[] driverFrame, Object[] operatorFrame) {
-        this.driverFrame = driverFrame;
-        this.operatorFrame = operatorFrame;
     }
 }

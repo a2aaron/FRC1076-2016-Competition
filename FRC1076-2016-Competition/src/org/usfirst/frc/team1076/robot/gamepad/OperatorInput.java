@@ -17,8 +17,8 @@ public class OperatorInput implements IOperatorInput {
 
 	@Override
 	public double armExtendSpeed() {
-	    // TODO: Check on actual robot if I can undo this negative symbol.
-		return gamepad.getAxis(GamepadAxis.LeftY);
+	    // You cannot remove this negative value
+		return -gamepad.getAxis(GamepadAxis.LeftY);
 	}
 	
 	@Override
@@ -30,9 +30,9 @@ public class OperatorInput implements IOperatorInput {
 
 	@Override
 	public IntakeRaiseState intakeRaiseState() {
-		boolean up = gamepad.getButton(GamepadButton.LB) ||
+		boolean down = gamepad.getButton(GamepadButton.LB) ||
 				gamepad.getButton(GamepadButton.Y);
-		boolean down = gamepad.getButton(GamepadButton.RB) ||
+		boolean up = gamepad.getButton(GamepadButton.RB) ||
 				gamepad.getButton(GamepadButton.A);
 		if (up && down) {
 			return IntakeRaiseState.Neutral;

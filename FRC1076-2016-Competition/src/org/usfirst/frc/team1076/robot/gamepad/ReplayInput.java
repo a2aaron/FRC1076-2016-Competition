@@ -6,6 +6,11 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.LinkedList;
+import java.util.NoSuchElementException;
+
+import org.usfirst.frc.team1076.robot.controllers.DriverFrame;
+import org.usfirst.frc.team1076.robot.controllers.OperatorFrame;
+import org.usfirst.frc.team1076.robot.controllers.RecordFrame;
 
 public class ReplayInput implements IOperatorInput, IDriverInput{
     /**
@@ -17,37 +22,28 @@ public class ReplayInput implements IOperatorInput, IDriverInput{
     File file;
     ObjectInputStream ois;
     long time;
-    LinkedList<Object[]> frames; 
-    Object[] driverFrame;
-    Object[] operatorFrame;
+    LinkedList<RecordFrame> frames;
+    int i = 0;
+    DriverFrame driverFrame;
+    OperatorFrame operatorFrame;
 
-    public ReplayInput(File file) {
+    public ReplayInput(File file) throws FileNotFoundException, IOException, ClassNotFoundException {
         this.file = file;
-        try {
-            this.ois = new ObjectInputStream(new FileInputStream(file));
-            frames = (LinkedList<Object[]>) ois.readObject();
-            ois.close();
-        } catch (FileNotFoundException e) {
-            System.out.println("Can't find the file " + file.getName());
-            e.printStackTrace();
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+        this.ois = new ObjectInputStream(new FileInputStream(file));
+        frames = (LinkedList<RecordFrame>) ois.readObject();
+        ois.close();
     }
 
-    public void getFrame() throws Exception {
-        if (frames.isEmpty()) {
+    public void getFrame() throws NoSuchElementException {
+        try {
+        RecordFrame frame = frames.get(i);
+        i++;
+        replaying = true;
+        driverFrame = frame.driverFrame;
+        operatorFrame = frame.operatorFrame;
+        } catch (IndexOutOfBoundsException e) {
             replaying = false;
-            driverFrame = null;
-            operatorFrame = null;
-            throw new Exception("Reached EOF");
-        } else {
-            replaying = true;
-            Object[] frame = frames.getFirst();
-            time = (long) frame[0];
-            driverFrame = (Object[]) frame[1];
-            operatorFrame = (Object[]) frame[2];
-            frames.removeFirst();
+            i = 0;
         }
     }
 
@@ -56,24 +52,24 @@ public class ReplayInput implements IOperatorInput, IDriverInput{
     }
     @Override
     public MotorOutput driveTrainSpeed() {
-        double left = (double) driverFrame[0];
-        double right = (double) driverFrame[1];
+        double left = driverFrame.driveTrainSpeedLeft;
+        double right = driverFrame.driveTrainSpeedRight;
         return new MotorOutput(left, right);
     }
 
     @Override
     public boolean brakesApplied() {
-        return (boolean) driverFrame[2];
+        return driverFrame.brakesApplied;
     }
 
     @Override
     public boolean shiftHigh() {
-        return (boolean) driverFrame[3];
+        return driverFrame.shiftHigh;
     }
 
     @Override
     public boolean shiftLow() {
-        return (boolean) driverFrame[4];
+        return driverFrame.shiftLow;
     }
 
     @Override
@@ -84,31 +80,31 @@ public class ReplayInput implements IOperatorInput, IDriverInput{
     }
 
     public boolean driverTurbo() {
-        return (boolean) driverFrame[5];
+        return driverFrame.turboArm;
     }
 
     @Override
     public double intakeSpeed() {
-        return (double) operatorFrame[0];
+        return operatorFrame.intakeSpeed;
     }
 
     @Override
     public IntakeRaiseState intakeRaiseState() {
-        return (IntakeRaiseState) operatorFrame[1];
+        return operatorFrame.intakeRaiseState;
     }
 
     @Override
     public double armSpeed() {
-        return (double) operatorFrame[2];
+        return operatorFrame.armSpeed;
     }
 
     @Override
     public double armExtendSpeed() {
-        return (double) operatorFrame[3];
+        return operatorFrame.armExtendSpeed;
     }
 
     public boolean operatorTurbo() {
-        return (boolean) operatorFrame[4];
+        return operatorFrame.turboArm;
     }
 
     // Use driverTurbo and operatorTurbo instead.

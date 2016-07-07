@@ -3,6 +3,7 @@ package org.usfirst.frc.team1076.test.controller;
 import static org.junit.Assert.*;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.usfirst.frc.team1076.robot.controllers.TeleopController;
 import org.usfirst.frc.team1076.test.mock.MockDriverInput;
@@ -38,7 +39,7 @@ public class TeleopControllerTest {
 		}
 	}
 	
-	@Test
+	@Test @Ignore
 	public void testUpArmMotion() {
 	    for (int i = 0; i <= 100; i++) {
 	        double armUpSpeed = controller.getArmUpSpeed();
@@ -53,7 +54,7 @@ public class TeleopControllerTest {
 	    }
 	}
 	
-	@Test
+	@Test @Ignore
 	public void testDownArmMotion() {
 	    for (int i = -100; i <= 0; i++) {
 	        double armDownSpeed = controller.getArmDownSpeed();
@@ -68,7 +69,7 @@ public class TeleopControllerTest {
 	    }
 	}
 
-	@Test
+	@Test @Ignore
 	public void testDriverTurboArmMotion() {
 	    for (int i = -100; i <= 0; i++) {
 	        double driverTurboSpeed = controller.getDriverTurboSpeed();
@@ -84,7 +85,7 @@ public class TeleopControllerTest {
 	    }
 	}
 
-    @Test
+    @Test @Ignore
     public void testOperatorTurboArmMotion() {
         for (int i = -100; i <= 0; i++) {
             double operatorTurboSpeed = controller.getOperatorTurboSpeed();

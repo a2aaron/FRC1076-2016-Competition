@@ -3,7 +3,9 @@ package org.usfirst.frc.team1076.robot.physical;
 
 import org.usfirst.frc.team1076.robot.ISolenoid;
 
+import java.io.EOFException;
 import java.io.File;
+import java.io.IOException;
 
 import org.usfirst.frc.team1076.robot.IRobot;
 import org.usfirst.frc.team1076.robot.controllers.AutoController;
@@ -62,7 +64,9 @@ public class Robot extends IterativeRobot implements IRobot {
 	static final int ARM_INDEX = 7;
 	static final int ARM_FOLLOWER_INDEX = 8;
 	double MOTOR_POWER_FACTOR = 0.9;
-	
+	// brake on port 4 (pneumatic)
+	// actuates (activates) when arm rotates (either direction)
+	// otherwise don't activate
 	CANTalon leftMotor = new CANTalon(LEFT_INDEX);
 	CANTalon leftFollower = new CANTalon(LEFT_FOLLOWER_INDEX);
 	CANTalon rightMotor = new CANTalon(RIGHT_INDEX);
@@ -83,6 +87,7 @@ public class Robot extends IterativeRobot implements IRobot {
 	IRobotController autoController;
 	IRobotController testController;
 
+	File file = new File(System.getProperty("user.home") + "recording");
 	RecordController recordController;
 	ReplayController replayController;
 	// Makes test mode record when true.
@@ -112,6 +117,9 @@ public class Robot extends IterativeRobot implements IRobot {
 	@Override
 	public void disabledInit() {
 		setBrakes(true);
+		if (recordController.isRecording()) {
+		    recordController.stopRecording();
+		}
 	}
 	
     /**
@@ -121,7 +129,7 @@ public class Robot extends IterativeRobot implements IRobot {
 	@Override
     public void robotInit() {
 		SmartDashboard.putBoolean("Low Bar", false);
-		SmartDashboard.putBoolean("Backwards", false);		
+		SmartDashboard.putBoolean("Backwards", false);
     	SmartDashboard.putNumber("LIDAR Speed", 80);
     	SmartDashboard.putNumber("Motor Tweak", MOTOR_POWER_FACTOR);
     	SmartDashboard.putString("Enemy Color", "red");
@@ -178,14 +186,23 @@ public class Robot extends IterativeRobot implements IRobot {
 		IDriverInput tank = new TankInput(driverGamepad);
 		IDriverInput arcade = new ArcadeInput(driverGamepad);
 		IOperatorInput operator = new OperatorInput(operatorGamepad);
-		ReplayInput replay = new ReplayInput(new File("recording"));
+		
+		ReplayInput replay = null;
+        try {
+            replay = new ReplayInput(file);
+        } catch (ClassNotFoundException | IOException e ) {
+            throw new RuntimeException(e.toString());
+        } 
+
 		teleopController = new TeleopController(tank, operator, tank, arcade);
-		encoder = new DistanceEncoder(new MotorEncoder(leftMotor), gearShifter);
+
 		autoController = new AutoController(new NothingAutonomous());
 		testController = new TestController(driverGamepad);
-		recordController = new RecordController(new File("recording"), tank, operator);
+		recordController = new RecordController(file, tank, operator);
 		replayController = new ReplayController(replay);
+
 		IChannel channel = new Channel(5880);
+	    encoder = new DistanceEncoder(new MotorEncoder(leftMotor), gearShifter);
 		sensorData = new SensorData(channel, FieldPosition.Right, new Gyro(new AnalogGyro(0)));
 		// TODO: Figure out what analog input channel we'll be using.
 	}
@@ -286,15 +303,15 @@ public class Robot extends IterativeRobot implements IRobot {
     	controlLidarMotor();
     	commonPeriodic();
     	if (teleopController.replayActivated()) {
-    	    replaying = true;
+    	    //replaying = true;
     	}
-    	if (replaying) {
-    	    try {
-                replayController.replayPeriodic(this);
-            } catch (Exception e) {
-                replaying = false;
-            }
-    	} else if (teleopController != null) {
+    	while (replaying) {
+    	    replayController.replayPeriodic(this);
+    	    replaying = replayController.replaying();
+    	}
+    	
+    	if (teleopController != null) {
+    	    //System.out.println("Teleop");
         	teleopController.teleopPeriodic(this);
         } else {
     		System.err.println("Teleop Controller on Robot is null in teleopPeriodic()");
@@ -338,9 +355,6 @@ public class Robot extends IterativeRobot implements IRobot {
     @Override
     public void disabledPeriodic() {
     	commonPeriodic();
-    	if (recordController.isRecording()) {
-    	    recordController.stopRecording();
-    	}
     }
 
     public void recordInit() {

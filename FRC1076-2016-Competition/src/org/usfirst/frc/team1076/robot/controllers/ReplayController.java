@@ -1,5 +1,8 @@
 package org.usfirst.frc.team1076.robot.controllers;
 
+import java.io.EOFException;
+import java.util.NoSuchElementException;
+
 import org.usfirst.frc.team1076.robot.IRobot;
 import org.usfirst.frc.team1076.robot.gamepad.ReplayInput;
 import org.usfirst.frc.team1076.robot.physical.GearShifter;
@@ -24,38 +27,36 @@ public class ReplayController {
 
     }
 
-    public void replayPeriodic(IRobot robot) throws Exception {
-        try {
-            double armSpeed = replayInput.armSpeed();
-            if (armSpeed > 0) {
-                robot.setArmSpeed(armSpeed * armUpSpeed);
+    public void replayPeriodic(IRobot robot) {
+        replayInput.getFrame();
+        double armSpeed = replayInput.armSpeed();
+        if (armSpeed > 0) {
+            robot.setArmSpeed(armSpeed * armUpSpeed);
+        } else {
+            if (replayInput.driverTurbo()) {
+                robot.setArmSpeed(armSpeed * driverTurboSpeed);
+            } else if (replayInput.operatorTurbo()) {
+                robot.setArmSpeed(armSpeed * operatorTurboSpeed);
             } else {
-                if (replayInput.driverTurbo()) {
-                    robot.setArmSpeed(armSpeed * driverTurboSpeed);
-                } else if (replayInput.operatorTurbo()) {
-                    robot.setArmSpeed(armSpeed * operatorTurboSpeed);
-                } else {
-                    robot.setArmSpeed(armSpeed * armDownSpeed);
-                }
+                robot.setArmSpeed(armSpeed * armDownSpeed);
             }
-            robot.setArmExtendSpeed(replayInput.armExtendSpeed());
-            robot.setIntakeSpeed(replayInput.intakeSpeed());
-            robot.setIntakeElevation(replayInput.intakeRaiseState());
-            MotorOutput drive = replayInput.driveTrainSpeed();
-            robot.setLeftSpeed(drive.left);
-            robot.setRightSpeed(drive.right);
-            robot.setBrakes(replayInput.brakesApplied());
-
-            if (replayInput.shiftHigh()) {
-                gearShifter.shiftHigh(robot);
-            } else if (replayInput.shiftLow()) {
-                gearShifter.shiftLow(robot);
-            } else {
-                // gearShifter.shiftAuto(robot);
-            }
-        } catch (Exception e) {
-            throw new Exception("replayInput reached EOF");
         }
+        robot.setArmExtendSpeed(replayInput.armExtendSpeed());
+        robot.setIntakeSpeed(replayInput.intakeSpeed());
+        robot.setIntakeElevation(replayInput.intakeRaiseState());
+        MotorOutput drive = replayInput.driveTrainSpeed();
+        robot.setLeftSpeed(drive.left);
+        robot.setRightSpeed(drive.right);
+        robot.setBrakes(replayInput.brakesApplied());
+
+        if (replayInput.shiftHigh()) {
+            gearShifter.shiftHigh(robot);
+        } else if (replayInput.shiftLow()) {
+            gearShifter.shiftLow(robot);
+        } else {
+            // gearShifter.shiftAuto(robot);
+        }
+
     }
 
     public boolean replaying() {
