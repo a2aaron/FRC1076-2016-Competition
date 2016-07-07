@@ -51,8 +51,8 @@ public class TeleopController implements IRobotController {
         helping. This difference can not be turned off.
         */
 	    double armSpeed = operatorInput.armSpeed();
-
-	    if (armSpeed == 0) {
+	    // armSpeed between -0.1 and 0.1
+	    if (Math.abs(armSpeed) < 0.1) {
 	        robot.setArmPneumatic(ArmPneumaticState.On);
 	    } else {
 	        robot.setArmPneumatic(ArmPneumaticState.Off);

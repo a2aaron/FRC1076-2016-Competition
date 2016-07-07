@@ -43,9 +43,9 @@ public class ArmAutonomous extends AutoState {
 	    }
 	    switch (liftDirection) {
 	    case Up:
-	        return speed;
-	    case Down:
 	        return -speed;
+	    case Down:
+	        return speed;
 	    default:
 	        return 0;
 	    }
