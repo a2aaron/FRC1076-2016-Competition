@@ -90,9 +90,10 @@ public class Robot extends IterativeRobot implements IRobot {
 	IRobotController autoController;
 	IRobotController testController;
 
-	File file = new File(System.getProperty("user.home") + "recording");
-	RecordController recordController;
-	ReplayController replayController;
+//	File file = new File(System.getProperty("user.home") + "recording");
+
+//	RecordController recordController;
+//	ReplayController replayController;
 	// Makes test mode record when true.
 	boolean recordingInTest = true;
 	boolean replaying = false;
@@ -120,9 +121,9 @@ public class Robot extends IterativeRobot implements IRobot {
 	@Override
 	public void disabledInit() {
 		setBrakes(true);
-		if (recordController.isRecording()) {
-		    recordController.stopRecording();
-		}
+//		if (recordController.isRecording()) {
+//		    recordController.stopRecording();
+//		}
 	}
 	
     /**
@@ -188,19 +189,27 @@ public class Robot extends IterativeRobot implements IRobot {
 		IDriverInput arcade = new ArcadeInput(driverGamepad);
 		IOperatorInput operator = new OperatorInput(operatorGamepad);
 		
-		ReplayInput replay = null;
-        try {
-            replay = new ReplayInput(file);
-        } catch (ClassNotFoundException | IOException e ) {
-            throw new RuntimeException(e.toString());
-        } 
+//		if (file.exists() == false) {
+//		    try {
+//		        file.createNewFile();
+//		    } catch (Exception e) {
+//		        e.printStackTrace();
+//		    }
+//		}
+//		
+//		ReplayInput replay = null;
+//        try {
+//            replay = new ReplayInput(file);
+//        } catch (ClassNotFoundException | IOException e ) {
+//            throw new RuntimeException(e.toString());
+//        } 
 
 		teleopController = new TeleopController(tank, operator, tank, arcade);
 
 		autoController = new AutoController(new NothingAutonomous());
 		testController = new TestController(driverGamepad);
-		recordController = new RecordController(file, tank, operator);
-		replayController = new ReplayController(replay);
+//		recordController = new RecordController(file, tank, operator);
+//		replayController = new ReplayController(replay);
 
 		IChannel channel = new Channel(5880);
 	    encoder = new DistanceEncoder(new MotorEncoder(leftMotor), gearShifter);
@@ -288,7 +297,7 @@ public class Robot extends IterativeRobot implements IRobot {
 
     	lidarMotorSpeed = SmartDashboard.getNumber("Initial Lidar Speed");
         replaying = false;
-        replayController.replayInit(this);;
+//        replayController.replayInit(this);;
     	if (teleopController != null) {
     		teleopController.teleopInit(this);
     	} else {
@@ -308,8 +317,8 @@ public class Robot extends IterativeRobot implements IRobot {
     	    //replaying = true;
     	}
     	while (replaying) {
-    	    replayController.replayPeriodic(this);
-    	    replaying = replayController.replaying();
+//    	    replayController.replayPeriodic(this);
+//    	    replaying = replayController.replaying();
     	}
     	
     	if (teleopController != null) {
@@ -361,12 +370,12 @@ public class Robot extends IterativeRobot implements IRobot {
 
     public void recordInit() {
         teleopInit();
-        recordController.startRecording();
+//        recordController.startRecording();
     }
     
     public void recordPeriodic() {
         teleopPeriodic();
-        recordController.recordFrame();
+//        recordController.recordFrame();
     }
 
 	@Override
