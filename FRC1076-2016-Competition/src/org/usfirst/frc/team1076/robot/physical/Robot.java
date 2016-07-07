@@ -5,6 +5,7 @@ import org.usfirst.frc.team1076.robot.ISolenoid;
 
 import java.io.EOFException;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.usfirst.frc.team1076.robot.IRobot;
@@ -68,7 +69,7 @@ public class Robot extends IterativeRobot implements IRobot {
 	// brake on port 4 (pneumatic)
 	// actuates (activates) when arm rotates (either direction)
 	// otherwise don't activate
-	// TODO: autonomous and replay versions of this.
+	// TODO: replay versions of this.
 	CANTalon leftMotor = new CANTalon(LEFT_INDEX);
 	CANTalon leftFollower = new CANTalon(LEFT_FOLLOWER_INDEX);
 	CANTalon rightMotor = new CANTalon(RIGHT_INDEX);
@@ -90,7 +91,7 @@ public class Robot extends IterativeRobot implements IRobot {
 	IRobotController autoController;
 	IRobotController testController;
 
-	File file = new File(System.getProperty("user.home") + "recording");
+	File file = new File(System.getProperty("user.home") + "/" + "recording");
 	RecordController recordController;
 	ReplayController replayController;
 	// Makes test mode record when true.
@@ -121,6 +122,7 @@ public class Robot extends IterativeRobot implements IRobot {
 	public void disabledInit() {
 		setBrakes(true);
 		if (recordController.isRecording()) {
+		    System.out.println("End of recording.");
 		    recordController.stopRecording();
 		}
 	}
@@ -188,12 +190,24 @@ public class Robot extends IterativeRobot implements IRobot {
 		IDriverInput arcade = new ArcadeInput(driverGamepad);
 		IOperatorInput operator = new OperatorInput(operatorGamepad);
 		
-		ReplayInput replay = null;
+		// Ensure the file exists
+        if (!file.exists()) {
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                // Likely a permission error.
+                throw new RuntimeException(e.toString());
+            } finally {
+                System.out.println(System.getProperty("user.home"));
+            }
+        }
+        
+        ReplayInput replay = null;
         try {
             replay = new ReplayInput(file);
         } catch (ClassNotFoundException | IOException e ) {
             throw new RuntimeException(e.toString());
-        } 
+        }
 
 		teleopController = new TeleopController(tank, operator, tank, arcade);
 
@@ -360,6 +374,7 @@ public class Robot extends IterativeRobot implements IRobot {
     }
 
     public void recordInit() {
+        System.out.println("Now recording...");
         teleopInit();
         recordController.startRecording();
     }
