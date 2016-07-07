@@ -1,12 +1,8 @@
-package org.usfirst.frc.team1076.robot.controllers;
-
-import java.io.EOFException;
-import java.util.NoSuchElementException;
+package org.usfirst.frc.team1076.robot.recordAndReplay;
 
 import org.usfirst.frc.team1076.robot.IRobot;
-import org.usfirst.frc.team1076.robot.gamepad.ReplayInput;
-import org.usfirst.frc.team1076.robot.physical.GearShifter;
 import org.usfirst.frc.team1076.robot.gamepad.IDriverInput.MotorOutput;
+import org.usfirst.frc.team1076.robot.physical.GearShifter;
 
 public class ReplayController {
     ReplayInput replayInput;

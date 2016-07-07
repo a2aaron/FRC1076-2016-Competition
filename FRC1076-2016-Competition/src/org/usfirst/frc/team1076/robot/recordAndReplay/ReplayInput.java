@@ -1,4 +1,4 @@
-package org.usfirst.frc.team1076.robot.gamepad;
+package org.usfirst.frc.team1076.robot.recordAndReplay;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -8,9 +8,8 @@ import java.io.ObjectInputStream;
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
 
-import org.usfirst.frc.team1076.robot.controllers.DriverFrame;
-import org.usfirst.frc.team1076.robot.controllers.OperatorFrame;
-import org.usfirst.frc.team1076.robot.controllers.RecordFrame;
+import org.usfirst.frc.team1076.robot.gamepad.IDriverInput;
+import org.usfirst.frc.team1076.robot.gamepad.IOperatorInput;
 
 public class ReplayInput implements IOperatorInput, IDriverInput{
     /**

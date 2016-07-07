@@ -10,12 +10,12 @@ import java.io.ObjectInputStream;
 import java.util.LinkedList;
 
 import org.junit.Test;
-import org.usfirst.frc.team1076.robot.controllers.RecordController;
-import org.usfirst.frc.team1076.robot.controllers.RecordFrame;
-import org.usfirst.frc.team1076.robot.controllers.ReplayController;
 import org.usfirst.frc.team1076.robot.gamepad.IDriverInput.MotorOutput;
 import org.usfirst.frc.team1076.robot.gamepad.IOperatorInput.IntakeRaiseState;
-import org.usfirst.frc.team1076.robot.gamepad.ReplayInput;
+import org.usfirst.frc.team1076.robot.recordAndReplay.RecordController;
+import org.usfirst.frc.team1076.robot.recordAndReplay.RecordFrame;
+import org.usfirst.frc.team1076.robot.recordAndReplay.ReplayController;
+import org.usfirst.frc.team1076.robot.recordAndReplay.ReplayInput;
 import org.usfirst.frc.team1076.test.mock.MockDriverInput;
 import org.usfirst.frc.team1076.test.mock.MockOperatorInput;
 import org.usfirst.frc.team1076.test.mock.MockRobot;

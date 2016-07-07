@@ -1,9 +1,8 @@
-package org.usfirst.frc.team1076.robot.controllers;
+package org.usfirst.frc.team1076.robot.recordAndReplay;
 
 import java.io.Serializable;
 
 import org.usfirst.frc.team1076.robot.gamepad.IDriverInput;
-import org.usfirst.frc.team1076.robot.gamepad.IOperatorInput;
 
 public class DriverFrame implements Serializable {
 
