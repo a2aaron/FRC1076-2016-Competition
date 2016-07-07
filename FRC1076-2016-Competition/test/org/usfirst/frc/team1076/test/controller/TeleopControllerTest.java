@@ -6,6 +6,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.usfirst.frc.team1076.robot.controllers.TeleopController;
+import org.usfirst.frc.team1076.robot.controllers.IRobotController.ArmPneumaticState;
 import org.usfirst.frc.team1076.test.mock.MockDriverInput;
 import org.usfirst.frc.team1076.test.mock.MockOperatorInput;
 import org.usfirst.frc.team1076.test.mock.MockRobot;
@@ -132,5 +133,22 @@ public class TeleopControllerTest {
 		driverInput.brakes = false;
 		controller.teleopPeriodic(robot);
 		assertEquals(false, robot.brakes);
+	}
+	
+	@Test
+	public void testArmPneumatic() {
+	    assertEquals("Robot should start with the pneumatic active", 
+	            ArmPneumaticState.On, robot.armPneumaticState);
+	    
+	    operatorInput.arm = 1;
+	    controller.teleopPeriodic(robot);
+	    assertEquals("Arm motion means pneumatic",
+	            ArmPneumaticState.Off, robot.armPneumaticState);
+	    
+	    operatorInput.arm = 0;
+        controller.teleopPeriodic(robot);
+        assertEquals("No arm motion means no pneumatic",
+                ArmPneumaticState.On, robot.armPneumaticState);
+
 	}
 }

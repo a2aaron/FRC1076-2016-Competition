@@ -10,6 +10,7 @@ import java.io.IOException;
 import org.usfirst.frc.team1076.robot.IRobot;
 import org.usfirst.frc.team1076.robot.controllers.AutoController;
 import org.usfirst.frc.team1076.robot.controllers.IRobotController;
+import org.usfirst.frc.team1076.robot.controllers.IRobotController.ArmPneumaticState;
 import org.usfirst.frc.team1076.robot.controllers.TeleopController;
 import org.usfirst.frc.team1076.robot.controllers.TestController;
 import org.usfirst.frc.team1076.robot.gamepad.ArcadeInput;
@@ -67,6 +68,7 @@ public class Robot extends IterativeRobot implements IRobot {
 	// brake on port 4 (pneumatic)
 	// actuates (activates) when arm rotates (either direction)
 	// otherwise don't activate
+	// TODO: autonomous and replay versions of this.
 	CANTalon leftMotor = new CANTalon(LEFT_INDEX);
 	CANTalon leftFollower = new CANTalon(LEFT_FOLLOWER_INDEX);
 	CANTalon rightMotor = new CANTalon(RIGHT_INDEX);
@@ -81,6 +83,7 @@ public class Robot extends IterativeRobot implements IRobot {
 	Compressor compressor = new Compressor(0);
 	ISolenoid intakePneumatic = new TwoSolenoid(1, 3);
 	ISolenoid shifterPneumatic = new TwoSolenoid(0, 2);
+	ISolenoid brakePneumatic = new OneSolenoid(4);
 	IDistanceEncoder encoder;
 	
 	IRobotController teleopController;
@@ -176,9 +179,7 @@ public class Robot extends IterativeRobot implements IRobot {
 		
 		compressor.setClosedLoopControl(true);
 		setIntakeElevation(IntakeRaiseState.Raised);
-		//TODO: Check that the controlls are accurate on robot
-		// Left button = intake up
-		// Right button = intake down
+		setArmPneumatic(ArmPneumaticState.On);
 		
 		IGamepad driverGamepad = new Gamepad(0);
 		gearShifter.shiftLow(this);
@@ -455,6 +456,21 @@ public class Robot extends IterativeRobot implements IRobot {
 			intakePneumatic.setNeutral();
 			break;
 		}
+	}
+	
+	@Override
+	public void setArmPneumatic(ArmPneumaticState state) {
+	    switch (state) {
+	    case On:
+	        brakePneumatic.setForward();
+	        break;
+	    case Off:
+	        brakePneumatic.setReverse();
+	        break;
+	    default:
+	        brakePneumatic.setNeutral();
+	        break;
+	    }
 	}
 	
 	private void controlLidarMotor() {
