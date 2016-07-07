@@ -205,10 +205,11 @@ public class Robot extends IterativeRobot implements IRobot {
         ReplayInput replay = null;
         try {
             replay = new ReplayInput(file);
+        } catch (EOFException e) {
+            System.out.println("Note: Recording file empty");
         } catch (ClassNotFoundException | IOException e ) {
             throw new RuntimeException(e.toString());
         }
-
 		teleopController = new TeleopController(tank, operator, tank, arcade);
 
 		autoController = new AutoController(new NothingAutonomous());
@@ -319,7 +320,7 @@ public class Robot extends IterativeRobot implements IRobot {
     	controlLidarMotor();
     	commonPeriodic();
     	if (teleopController.replayActivated()) {
-    	    //replaying = true;
+    	    replaying = true;
     	}
     	while (replaying) {
     	    replayController.replayPeriodic(this);
@@ -327,7 +328,7 @@ public class Robot extends IterativeRobot implements IRobot {
     	}
     	
     	if (teleopController != null) {
-    	    //System.out.println("Teleop");
+//    	    System.out.println("Teleop");
         	teleopController.teleopPeriodic(this);
         } else {
     		System.err.println("Teleop Controller on Robot is null in teleopPeriodic()");
