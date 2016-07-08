@@ -36,6 +36,8 @@ public class TeleopController implements IRobotController {
 	@Override
 	public void teleopInit(IRobot robot) {
 		gearShifter.shiftLow(robot);
+		// Default the input to tank when enabling the robot.
+		driverInput = tankInput;
 	}
 	
 	@Override
@@ -68,6 +70,7 @@ public class TeleopController implements IRobotController {
                 robot.setArmSpeed(armSpeed * armDownSpeed);
             }
         }
+		//System.out.println("Joystick: " + operatorInput.armExtendSpeed());
         robot.setArmExtendSpeed(operatorInput.armExtendSpeed());
 		robot.setIntakeSpeed(operatorInput.intakeSpeed());
 		robot.setIntakeElevation(operatorInput.intakeRaiseState());
@@ -120,5 +123,9 @@ public class TeleopController implements IRobotController {
 
     public boolean replayActivated() {
         return operatorInput.replayButtonHeld();
+    }
+    
+    public IDriverInput getDriverInput() {
+        return driverInput;
     }
 }

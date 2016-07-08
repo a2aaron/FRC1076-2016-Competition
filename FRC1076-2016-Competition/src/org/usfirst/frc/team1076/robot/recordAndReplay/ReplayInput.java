@@ -73,9 +73,7 @@ public class ReplayInput implements IOperatorInput, IDriverInput{
 
     @Override
     public ControlSide controlSide() {
-        // What would go here? You can't switch while
-        // in this input.
-        return null;
+        return driverFrame.controlSide;
     }
 
     public boolean driverTurbo() {

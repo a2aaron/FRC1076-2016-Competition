@@ -190,37 +190,29 @@ public class Robot extends IterativeRobot implements IRobot {
 		IDriverInput arcade = new ArcadeInput(driverGamepad);
 		IOperatorInput operator = new OperatorInput(operatorGamepad);
 		
-		// Ensure the file exists
-        if (!file.exists()) {
-            try {
-                file.createNewFile();
-            } catch (IOException e) {
-                // Likely a permission error.
-                throw new RuntimeException(e.toString());
-            } finally {
-                System.out.println(System.getProperty("user.home"));
-            }
-        }
-        
-        ReplayInput replay = null;
+		// Record and Replay System
         try {
-            replay = new ReplayInput(file);
+            // Ensure the file exists
+            if (!file.exists()) {
+                   file.createNewFile();
+            }
+            ReplayInput replay = new ReplayInput(file);
+            recordController = new RecordController(file, tank, operator);
+            replayController = new ReplayController(replay);
         } catch (EOFException e) {
-            System.out.println("Note: Recording file empty");
+            System.err.println("Recording file empty!");
         } catch (ClassNotFoundException | IOException e ) {
             throw new RuntimeException(e.toString());
         }
 		teleopController = new TeleopController(tank, operator, tank, arcade);
-
 		autoController = new AutoController(new NothingAutonomous());
 		testController = new TestController(driverGamepad);
-		recordController = new RecordController(file, tank, operator);
-		replayController = new ReplayController(replay);
+		
 
 		IChannel channel = new Channel(5880);
 	    encoder = new DistanceEncoder(new MotorEncoder(leftMotor), gearShifter);
 		sensorData = new SensorData(channel, FieldPosition.Right, new Gyro(new AnalogGyro(0)));
-		// TODO: Figure out what analog input channel we'll be using.
+		// TODO: Figure out what analog input channel we'll be using. done??
 	}
     
 	/**
@@ -300,7 +292,6 @@ public class Robot extends IterativeRobot implements IRobot {
         // does not work. Note that this will cause a brief disabling of the arm.
 //        armMotor.ConfigFwdLimitSwitchNormallyOpen(true);
 //        armFollower.ConfigFwdLimitSwitchNormallyOpen(true);
-
     	lidarMotorSpeed = SmartDashboard.getNumber("Initial Lidar Speed");
         replaying = false;
         replayController.replayInit(this);;
@@ -320,6 +311,7 @@ public class Robot extends IterativeRobot implements IRobot {
     	controlLidarMotor();
     	commonPeriodic();
     	if (teleopController.replayActivated()) {
+    	    System.out.println("Replaying...");
     	    replaying = true;
     	}
     	while (replaying) {
@@ -337,6 +329,14 @@ public class Robot extends IterativeRobot implements IRobot {
     
     @Override
     public void testInit() {
+        if (file.exists()) {
+            file.delete();
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
         if (recordingInTest) {
             recordInit();
         } else if (testController != null) {
