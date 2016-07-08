@@ -23,10 +23,13 @@ public class ReplayController {
         teleop = new TeleopController(replayInput, replayInput, replayInput, replayInput);
     }
 
-    public void replayInit(IRobot robot) {    }
+    public void replayInit(IRobot robot) {
+        System.out.println("Num frames: " + replayInput.numberOfFrames());
+    }
 
     public void replayPeriodic(IRobot robot) {
         replayInput.getFrame();
+        replayInput.print();
         teleop.teleopPeriodic(robot);
     }
 

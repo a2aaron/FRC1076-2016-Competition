@@ -52,6 +52,7 @@ public class RecordController {
 
     public void startRecording() {
         try {
+            frames = new LinkedList<RecordFrame>();
             ois = new ObjectOutputStream(new FileOutputStream(file));
         } catch (IOException e) {
             // TODO Auto-generated catch block
@@ -85,6 +86,7 @@ public class RecordController {
             ois.flush();
             ois.close();
             isRecording = false;
+            System.out.println("End of Recording. Wrote " + frames.size() + " frames.");
         } catch (IOException e) {
             e.printStackTrace();
         }

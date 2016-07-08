@@ -94,8 +94,8 @@ public class Robot extends IterativeRobot implements IRobot {
 	File file = new File(System.getProperty("user.home") + "/" + "recording");
 	RecordController recordController;
 	ReplayController replayController;
-	boolean recordingInTest = false;
-	boolean replayEnabled = false;
+	boolean recordingInTest = true;
+	boolean replayEnabled = true;
 	boolean currentlyReplaying = false;
 	double robotSpeed = 1;
 	double intakeSpeed = 1;
@@ -120,11 +120,13 @@ public class Robot extends IterativeRobot implements IRobot {
 	@Override
 	public void disabledInit() {
 		setBrakes(true);
+		setArmPneumatic(ArmPneumaticState.Off);
 		if (recordingInTest && recordController.isRecording()) {
 		    System.out.println("End of recording.");
 		    recordController.stopRecording();
 		}
 	}
+	
 	
     /**
      * This function is run when the robot is first started up and should be
@@ -282,7 +284,14 @@ public class Robot extends IterativeRobot implements IRobot {
     	lidarMotorSpeed = SmartDashboard.getNumber("Initial Lidar Speed");
         currentlyReplaying = false;
         if (replayEnabled) {
-            replayController.replayInit(this);;
+            ReplayInput replayInput = null;
+            try {
+                replayInput = new ReplayInput(file);
+            } catch (ClassNotFoundException | IOException e) {
+                e.printStackTrace();
+            }
+            replayController = new ReplayController(replayInput);
+            replayController.replayInit(this);
         }
     	if (teleopController != null) {
     		teleopController.teleopInit(this);
@@ -299,7 +308,7 @@ public class Robot extends IterativeRobot implements IRobot {
     public void teleopPeriodic() {
     	controlLidarMotor();
     	commonPeriodic();
-    	if (replayEnabled && teleopController.replayActivated()) {
+    	if (replayEnabled && teleopController.replayActivated() && !currentlyReplaying) {
     	    System.out.println("Replaying...");
     	    currentlyReplaying = true;
     	}
@@ -317,14 +326,7 @@ public class Robot extends IterativeRobot implements IRobot {
     
     @Override
     public void testInit() {
-        if (file.exists()) {
-            file.delete();
-            try {
-                file.createNewFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+
         if (recordingInTest) {
             recordInit();
         } else if (testController != null) {
@@ -363,6 +365,15 @@ public class Robot extends IterativeRobot implements IRobot {
     }
 
     public void recordInit() {
+        if (file.exists()) {
+            boolean deleted = file.delete();
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            System.out.println("Deleted Previous File: " + deleted);
+        }
         System.out.println("Now recording...");
         teleopInit();
         recordController.startRecording();

@@ -40,11 +40,21 @@ public class ReplayInput implements IOperatorInput, IDriverInput{
     }
 
     public void getFrame() throws NoSuchElementException {
-        RecordFrame frame = frames.get(i);
-        i++;
-        replaying = true;
-        driverFrame = frame.driverFrame;
-        operatorFrame = frame.operatorFrame;
+        try {
+            RecordFrame frame = frames.get(i);
+            i++;
+            replaying = true;
+            driverFrame = frame.driverFrame;
+            operatorFrame = frame.operatorFrame;
+            System.out.println("Playing frame: " + i + "/" + frames.size());
+        } catch (IndexOutOfBoundsException e) {
+            RecordFrame frame = new BlankRecordFrame();
+            i = 0;
+            replaying = false;
+            driverFrame = frame.driverFrame;
+            operatorFrame = frame.operatorFrame;
+
+        }
     }
 
     public boolean isReplaying() {
@@ -115,5 +125,15 @@ public class ReplayInput implements IOperatorInput, IDriverInput{
     @Override @Deprecated
     public boolean replayButtonHeld() {
         return false;
+    }
+    
+    public void print() {
+        System.out.println("arm extend: " + operatorFrame.armExtendSpeed);
+        System.out.println("left: " + driverFrame.driveTrainSpeedLeft);
+        System.out.println("right" + driverFrame.driveTrainSpeedRight);
+    }
+    
+    public int numberOfFrames() {
+        return frames.size();
     }
 }
