@@ -97,7 +97,7 @@ public class Robot extends IterativeRobot implements IRobot {
 	// Makes test mode record when true.
 	boolean recordingInTest = true;
 	boolean replaying = false;
-
+	boolean replayEnabled = false;
 	double robotSpeed = 1;
 	double intakeSpeed = 1;
 //	double armUpSpeed = 0.4;
@@ -121,7 +121,7 @@ public class Robot extends IterativeRobot implements IRobot {
 	@Override
 	public void disabledInit() {
 		setBrakes(true);
-		if (recordController.isRecording()) {
+		if (replayEnabled && recordController.isRecording()) {
 		    System.out.println("End of recording.");
 		    recordController.stopRecording();
 		}
@@ -153,19 +153,11 @@ public class Robot extends IterativeRobot implements IRobot {
 		leftFollower.setInverted(true);
 		leftMotor.setInverted(true);
 //		armExtendMotor.setInverted(false);
-//		armExtendMotor.setInverted(false); //NO changes
 		armMotor.enableBrakeMode(true);
 		armFollower.enableBrakeMode(true);
 		armExtendMotor.enableBrakeMode(true);
 		armExtendFollower.enableBrakeMode(true);
 
-		
-//		armMotor.ConfigFwdLimitSwitchNormallyOpen(true);
-//		armMotor.ConfigRevLimitSwitchNormallyOpen(true);
-//		armMotor.enableLimitSwitch(true, true);
-//		armFollower.ConfigFwdLimitSwitchNormallyOpen(true);
-//		armFollower.ConfigRevLimitSwitchNormallyOpen(true);
-//		armFollower.enableLimitSwitch(true, true);
 		armExtendMotor.ConfigFwdLimitSwitchNormallyOpen(true);
 		armExtendMotor.ConfigRevLimitSwitchNormallyOpen(true);
 		armExtendMotor.enableLimitSwitch(true, true);
@@ -175,7 +167,6 @@ public class Robot extends IterativeRobot implements IRobot {
 		
 		armExtendFollower.changeControlMode(CANTalon.TalonControlMode.Follower);
 		armExtendFollower.set(ARM_EXTEND_INDEX);
-//		System.out.println("Enabled all limit switches");
 		// leftFollower.changeControlMode(TalonControlMode.Follower);
 		// leftFollower.set(LEFT_INDEX);
 		
@@ -226,11 +217,6 @@ public class Robot extends IterativeRobot implements IRobot {
 	 */
 	@Override
     public void autonomousInit() {
-	    // Setting the limit switch to be normally closed
-	    // ensures that the motors will disable if the limit switches break.
-//	    armMotor.ConfigFwdLimitSwitchNormallyOpen(false);
-//	    armFollower.ConfigFwdLimitSwitchNormallyOpen(false);
-
 		sensorData.sendAttackColor("tegra-ubuntu:5888", SmartDashboard.getString("Enemy Color"));
 		
 		if (false && SmartDashboard.getBoolean("Auto Program Enabled")) {
@@ -287,14 +273,11 @@ public class Robot extends IterativeRobot implements IRobot {
 
     @Override
     public void teleopInit() {
-        // Setting the limit switches to be normally open
-        // ensures the motor always works even when the limit switch
-        // does not work. Note that this will cause a brief disabling of the arm.
-//        armMotor.ConfigFwdLimitSwitchNormallyOpen(true);
-//        armFollower.ConfigFwdLimitSwitchNormallyOpen(true);
     	lidarMotorSpeed = SmartDashboard.getNumber("Initial Lidar Speed");
         replaying = false;
-        replayController.replayInit(this);;
+        if (replayEnabled) {
+            replayController.replayInit(this);;
+        }
     	if (teleopController != null) {
     		teleopController.teleopInit(this);
     	} else {
@@ -310,7 +293,7 @@ public class Robot extends IterativeRobot implements IRobot {
     public void teleopPeriodic() {
     	controlLidarMotor();
     	commonPeriodic();
-    	if (teleopController.replayActivated()) {
+    	if (replayEnabled && teleopController.replayActivated()) {
     	    System.out.println("Replaying...");
     	    replaying = true;
     	}
@@ -320,7 +303,6 @@ public class Robot extends IterativeRobot implements IRobot {
     	}
     	
     	if (teleopController != null) {
-//    	    System.out.println("Teleop");
         	teleopController.teleopPeriodic(this);
         } else {
     		System.err.println("Teleop Controller on Robot is null in teleopPeriodic()");
