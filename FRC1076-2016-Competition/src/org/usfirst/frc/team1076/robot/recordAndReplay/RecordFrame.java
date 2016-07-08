@@ -2,6 +2,9 @@ package org.usfirst.frc.team1076.robot.recordAndReplay;
 
 import java.io.Serializable;
 
+import org.usfirst.frc.team1076.robot.gamepad.IDriverInput.ControlSide;
+import org.usfirst.frc.team1076.robot.gamepad.IOperatorInput.IntakeRaiseState;
+
 public class RecordFrame implements Serializable {
     /**
      * 
@@ -10,8 +13,8 @@ public class RecordFrame implements Serializable {
     public DriverFrame driverFrame;
     public OperatorFrame operatorFrame;
     
-    public RecordFrame(DriverFrame driverFrame, OperatorFrame operatorFrame2) {
+    public RecordFrame(DriverFrame driverFrame, OperatorFrame operatorFrame) {
         this.driverFrame = driverFrame;
-        this.operatorFrame = operatorFrame2;
+        this.operatorFrame = operatorFrame;
     }
 }

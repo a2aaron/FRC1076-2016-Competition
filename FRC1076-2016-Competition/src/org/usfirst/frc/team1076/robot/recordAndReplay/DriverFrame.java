@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 import org.usfirst.frc.team1076.robot.gamepad.IDriverInput;
 import org.usfirst.frc.team1076.robot.gamepad.IDriverInput.ControlSide;
+import org.usfirst.frc.team1076.robot.gamepad.IOperatorInput.IntakeRaiseState;
 
 public class DriverFrame implements Serializable {
 
@@ -27,5 +28,13 @@ public class DriverFrame implements Serializable {
         turboArm = driverInput.turboArm();
         controlSide = driverInput.controlSide();
     }
-
+    public DriverFrame() {
+        brakesApplied = false;
+        driveTrainSpeedLeft = 0;
+        driveTrainSpeedRight = 0;
+        controlSide = ControlSide.Current;
+        shiftHigh = false;
+        shiftLow = false;
+        turboArm = false;
+    }
 }

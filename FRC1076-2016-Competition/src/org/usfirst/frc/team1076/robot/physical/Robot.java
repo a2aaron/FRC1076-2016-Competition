@@ -94,10 +94,9 @@ public class Robot extends IterativeRobot implements IRobot {
 	File file = new File(System.getProperty("user.home") + "/" + "recording");
 	RecordController recordController;
 	ReplayController replayController;
-	// Makes test mode record when true.
-	boolean recordingInTest = true;
-	boolean replaying = false;
+	boolean recordingInTest = false;
 	boolean replayEnabled = false;
+	boolean currentlyReplaying = false;
 	double robotSpeed = 1;
 	double intakeSpeed = 1;
 //	double armUpSpeed = 0.4;
@@ -121,7 +120,7 @@ public class Robot extends IterativeRobot implements IRobot {
 	@Override
 	public void disabledInit() {
 		setBrakes(true);
-		if (replayEnabled && recordController.isRecording()) {
+		if (recordingInTest && recordController.isRecording()) {
 		    System.out.println("End of recording.");
 		    recordController.stopRecording();
 		}
@@ -182,19 +181,26 @@ public class Robot extends IterativeRobot implements IRobot {
 		IOperatorInput operator = new OperatorInput(operatorGamepad);
 		
 		// Record and Replay System
-        try {
-            // Ensure the file exists
-            if (!file.exists()) {
-                   file.createNewFile();
-            }
-            ReplayInput replay = new ReplayInput(file);
-            recordController = new RecordController(file, tank, operator);
-            replayController = new ReplayController(replay);
-        } catch (EOFException e) {
-            System.err.println("Recording file empty!");
-        } catch (ClassNotFoundException | IOException e ) {
-            throw new RuntimeException(e.toString());
-        }
+		if (replayEnabled) {
+		    try {
+		        // Ensure the file exists
+		        if (!file.exists()) {
+		            file.createNewFile();
+		        }
+		    } catch (EOFException e) {
+		        System.err.println("Recording file empty!");
+		    } catch (IOException e) {
+		        throw new RuntimeException(e.toString());
+		    }
+
+		    try {
+		        ReplayInput replay = new ReplayInput(file);
+		        recordController = new RecordController(file, tank, operator);
+		        replayController = new ReplayController(replay);
+		    } catch (Exception e) {
+		        throw new RuntimeException(e.toString());
+		    }
+		}
 		teleopController = new TeleopController(tank, operator, tank, arcade);
 		autoController = new AutoController(new NothingAutonomous());
 		testController = new TestController(driverGamepad);
@@ -227,7 +233,7 @@ public class Robot extends IterativeRobot implements IRobot {
 			autoDriveDistance = SmartDashboard.getNumber("Distance");
 			lidarMotorSpeed = SmartDashboard.getNumber("Initial Lidar Speed");
 			
-			autoController = new AutoController(new ArmAutonomous(750, 0.25, LiftDirection.Down)
+			autoController = new AutoController(new ArmAutonomous(750, -0.25, LiftDirection.Down)
 												.addNext(new ForwardAutonomous(7000, 0.75))); 
 												//TODO: investigate forwards backwards stuff.
 //			autoController = new AutoController
@@ -274,7 +280,7 @@ public class Robot extends IterativeRobot implements IRobot {
     @Override
     public void teleopInit() {
     	lidarMotorSpeed = SmartDashboard.getNumber("Initial Lidar Speed");
-        replaying = false;
+        currentlyReplaying = false;
         if (replayEnabled) {
             replayController.replayInit(this);;
         }
@@ -295,11 +301,11 @@ public class Robot extends IterativeRobot implements IRobot {
     	commonPeriodic();
     	if (replayEnabled && teleopController.replayActivated()) {
     	    System.out.println("Replaying...");
-    	    replaying = true;
+    	    currentlyReplaying = true;
     	}
-    	while (replaying) {
+    	while (currentlyReplaying) {
     	    replayController.replayPeriodic(this);
-    	    replaying = replayController.replaying();
+    	    currentlyReplaying = replayController.replaying();
     	}
     	
     	if (teleopController != null) {

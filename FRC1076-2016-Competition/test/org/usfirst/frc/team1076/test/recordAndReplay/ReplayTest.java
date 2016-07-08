@@ -31,6 +31,20 @@ public class ReplayTest {
         driver.reset();
         operator.reset();
     }
+    @Test
+    public void ReadNothingTest() throws IOException, ClassNotFoundException {
+        // Setup
+        init();
+        File file = new File(folder+"nothing_test");
+        file.createNewFile();
+        ReplayInput input = new ReplayInput(file);
+        ReplayController controller = new ReplayController(input);
+        assertFalse(input.isReplaying());
+        assertFalse(controller.replaying());
+        controller.replayPeriodic(robot);
+        file.deleteOnExit();
+    }
+    
 
     @Test
     public void RecordFrameReadTest() throws FileNotFoundException, ClassNotFoundException, IOException {

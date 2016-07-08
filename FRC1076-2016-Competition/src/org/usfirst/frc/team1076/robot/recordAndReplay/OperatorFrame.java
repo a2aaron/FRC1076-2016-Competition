@@ -23,5 +23,13 @@ public class OperatorFrame implements Serializable {
         armExtendSpeed = operatorInput.armExtendSpeed();
         turboArm = operatorInput.turboArm();
     }
+    
+    public OperatorFrame() {
+        armExtendSpeed = 0;
+        armSpeed = 0;
+        intakeRaiseState = IntakeRaiseState.Neutral;
+        intakeSpeed = 0;
+        turboArm = false;
+    }
 
 }

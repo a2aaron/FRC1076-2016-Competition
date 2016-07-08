@@ -1,5 +1,6 @@
 package org.usfirst.frc.team1076.robot.recordAndReplay;
 
+import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -28,22 +29,22 @@ public class ReplayInput implements IOperatorInput, IDriverInput{
 
     public ReplayInput(File file) throws FileNotFoundException, IOException, ClassNotFoundException {
         this.file = file;
-        this.ois = new ObjectInputStream(new FileInputStream(file));
-        frames = (LinkedList<RecordFrame>) ois.readObject();
-        ois.close();
+        try {
+            this.ois = new ObjectInputStream(new FileInputStream(file));
+            frames = (LinkedList<RecordFrame>) ois.readObject();
+            ois.close();
+        } catch (EOFException e) {
+            frames = new LinkedList<RecordFrame>();
+            frames.add(new BlankRecordFrame());
+        }
     }
 
     public void getFrame() throws NoSuchElementException {
-        try {
         RecordFrame frame = frames.get(i);
         i++;
         replaying = true;
         driverFrame = frame.driverFrame;
         operatorFrame = frame.operatorFrame;
-        } catch (IndexOutOfBoundsException e) {
-            replaying = false;
-            i = 0;
-        }
     }
 
     public boolean isReplaying() {
