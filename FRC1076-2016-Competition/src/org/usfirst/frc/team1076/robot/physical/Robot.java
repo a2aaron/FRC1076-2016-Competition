@@ -105,6 +105,7 @@ public class Robot extends IterativeRobot implements IRobot {
 		setArmPneumatic(ArmPneumaticState.Off);
 	}
 	
+	
     /**
      * This function is run when the robot is first started up and should be
      * used for any initialization code.
@@ -160,13 +161,14 @@ public class Robot extends IterativeRobot implements IRobot {
 		IDriverInput arcade = new ArcadeInput(driverGamepad);
 		IOperatorInput operator = new OperatorInput(operatorGamepad);
 		teleopController = new TeleopController(tank, operator, tank, arcade);
-		encoder = new DistanceEncoder(new MotorEncoder(leftMotor), gearShifter);
 		autoController = new AutoController(new NothingAutonomous());
 		testController = new TestController(driverGamepad);
 		
+
 		IChannel channel = new Channel(5880);
+	    encoder = new DistanceEncoder(new MotorEncoder(leftMotor), gearShifter);
 		sensorData = new SensorData(channel, FieldPosition.Right, new Gyro(new AnalogGyro(0)));
-		// TODO: Figure out what analog input channel we'll be using.
+		// TODO: Figure out what analog input channel we'll be using. done??
 	}
     
 	/**

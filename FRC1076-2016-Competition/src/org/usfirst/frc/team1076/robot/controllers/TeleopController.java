@@ -36,6 +36,8 @@ public class TeleopController implements IRobotController {
 	@Override
 	public void teleopInit(IRobot robot) {
 		gearShifter.shiftLow(robot);
+		// Default the input to tank when enabling the robot.
+		driverInput = tankInput;
 	}
 	
 	@Override
@@ -119,4 +121,8 @@ public class TeleopController implements IRobotController {
         return armDownSpeed;
     }
 
+    
+    public IDriverInput getDriverInput() {
+        return driverInput;
+    }
 }
