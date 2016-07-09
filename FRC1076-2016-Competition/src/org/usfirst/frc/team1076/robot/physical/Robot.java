@@ -396,10 +396,10 @@ public class Robot extends IterativeRobot implements IRobot {
 	public void setIntakeElevation(IntakeRaiseState state) {
 		switch (state) {
 		case Lowered:
-			intakePneumatic.setReverse();
+			intakePneumatic.setForward();
 			break;
 		case Raised:
-			intakePneumatic.setForward();
+			intakePneumatic.setReverse();
 			break;
 		case Neutral:
 		default:

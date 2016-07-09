@@ -17,8 +17,8 @@ public class OperatorInput implements IOperatorInput {
 
 	@Override
 	public double armExtendSpeed() {
-	    // TODO: Check on actual robot if I can undo this negative symbol.
-		return gamepad.getAxis(GamepadAxis.LeftY);
+	    // You cannot remove this negative value
+		return -gamepad.getAxis(GamepadAxis.LeftY);
 	}
 	
 	@Override
