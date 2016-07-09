@@ -1,7 +1,7 @@
 package org.usfirst.frc.team1076.robot.gamepad;
 
 public interface IOperatorInput {
-	enum IntakeRaiseState { Lowered, Raised, Neutral }
+	public enum IntakeRaiseState { Lowered, Raised, Neutral }
 
 	IntakeRaiseState intakeRaiseState();
 	double intakeSpeed();
