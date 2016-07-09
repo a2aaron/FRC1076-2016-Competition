@@ -17,4 +17,5 @@ public interface IDriverInput {
 	
 	enum ControlSide { Left, Right, Current }
 	ControlSide controlSide();
+	boolean turboArm();
 }

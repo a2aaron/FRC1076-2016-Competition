@@ -17,6 +17,8 @@ import org.usfirst.frc.team1076.robot.gamepad.OperatorInput;
 import org.usfirst.frc.team1076.robot.gamepad.TankInput;
 import org.usfirst.frc.team1076.robot.sensors.DistanceEncoder;
 import org.usfirst.frc.team1076.robot.sensors.IDistanceEncoder;
+import org.usfirst.frc.team1076.robot.statemachine.ArmAutonomous;
+import org.usfirst.frc.team1076.robot.statemachine.ArmAutonomous.LiftDirection;
 import org.usfirst.frc.team1076.robot.statemachine.AutoState;
 import org.usfirst.frc.team1076.robot.statemachine.ForwardAutonomous;
 import org.usfirst.frc.team1076.robot.statemachine.IntakeAutonomous;
@@ -50,8 +52,8 @@ public class Robot extends IterativeRobot implements IRobot {
 	static final int RIGHT_FOLLOWER_INDEX = 2;
 	static final int INTAKE_INDEX = 5;
 	// None of the below indexes are correct.
-	static final int ARM_EXTEND_INDEX = 6;
-	static final int ARM_EXTEND_FOLLOWER_INDEX = 9;
+	static final int ARM_EXTEND_INDEX = 9;
+	static final int ARM_EXTEND_FOLLOWER_INDEX = 6;
 	static final int ARM_INDEX = 7;
 	static final int ARM_FOLLOWER_INDEX = 8;
 	double MOTOR_POWER_FACTOR = 0.9;
@@ -78,8 +80,11 @@ public class Robot extends IterativeRobot implements IRobot {
 	
 	double robotSpeed = 1;
 	double intakeSpeed = 1;
-	double armSpeed = 0.5;
+//	double armUpSpeed = 0.4;
+//	double armDownSpeed = 0.23;
 	double armExtendSpeed = 1;
+//	double driverTurboSpeed = 1;
+//	double operatorTurboSpeed = 0.75;
 	double upperGearThreshold = 0.6;
 	double lowerGearThreshold = 0.4;
 	
@@ -112,34 +117,54 @@ public class Robot extends IterativeRobot implements IRobot {
 		SmartDashboard.putNumber("Distance", autoDriveDistance);
 		SmartDashboard.putNumber("Initial Lidar Speed", initialLidarSpeed);
     	SmartDashboard.putBoolean("Auto Program Enabled", false);
-    	SmartDashboard.putString("Auto Program", "elevate up ; forward 3.9 0.65 ; elevate down ;"
-    			+ "forward 0.6 0.5 ; rotate left 0.3 ; forward 3.5 ; rotate right 0.59 ;"
-    			+ "vision 2.5 0.45 ; intake 1 out ; intake 0.5 in ; rotate right 0.05 ;"
-    			+ "intake 1 out ; intake 0.5 in ; rotate right 0.05 ; intake 1 out");
-
+    	//SmartDashboard.putString("Auto Program", "elevate up ; forward 3.9 0.65 ; elevate down ;"
+    	//		+ "forward 0.6 0.5 ; rotate left 0.3 ; forward 3.5 ; rotate right 0.59 ;"
+    	//		+ "vision 2.5 0.45 ; intake 1 out ; intake 0.5 in ; rotate right 0.05 ;"
+    	//		+ "intake 1 out ; intake 0.5 in ; rotate right 0.05 ; intake 1 out");
+    	SmartDashboard.putString("Auto Program", "nothing");
 		// Initialize the physical components before the controllers,
 		// in case they depend on them.
 		// rightFollower.changeControlMode(TalonControlMode.Follower);
 		// rightFollower.set(RIGHT_INDEX);
 		leftFollower.setInverted(true);
 		leftMotor.setInverted(true);
+//		armExtendMotor.setInverted(false);
+//		armExtendMotor.setInverted(false); //NO changes
 		armMotor.enableBrakeMode(true);
 		armFollower.enableBrakeMode(true);
 		armExtendMotor.enableBrakeMode(true);
 		armExtendFollower.enableBrakeMode(true);
+
+		
+//		armMotor.ConfigFwdLimitSwitchNormallyOpen(true);
+//		armMotor.ConfigRevLimitSwitchNormallyOpen(true);
+//		armMotor.enableLimitSwitch(true, true);
+//		armFollower.ConfigFwdLimitSwitchNormallyOpen(true);
+//		armFollower.ConfigRevLimitSwitchNormallyOpen(true);
+//		armFollower.enableLimitSwitch(true, true);
+		armExtendMotor.ConfigFwdLimitSwitchNormallyOpen(true);
+		armExtendMotor.ConfigRevLimitSwitchNormallyOpen(true);
+		armExtendMotor.enableLimitSwitch(true, true);
+		armExtendFollower.ConfigFwdLimitSwitchNormallyOpen(true);
+		armExtendFollower.ConfigRevLimitSwitchNormallyOpen(true);
+		armExtendFollower.enableLimitSwitch(true, true);
+		
+		armExtendFollower.changeControlMode(CANTalon.TalonControlMode.Follower);
+		armExtendFollower.set(ARM_EXTEND_INDEX);
+//		System.out.println("Enabled all limit switches");
 		// leftFollower.changeControlMode(TalonControlMode.Follower);
 		// leftFollower.set(LEFT_INDEX);
 		
 		compressor.setClosedLoopControl(true);
-		setIntakeElevation(IntakeRaiseState.Raised);
-		gearShifter.shiftLow(this);
+		setIntakeElevation(IntakeRaiseState.Lowered); //TODO: the lable for lowered and raised is swaped incorrectly!
 		
 		IGamepad driverGamepad = new Gamepad(0);
+		gearShifter.shiftLow(this);
 		IGamepad operatorGamepad = new Gamepad(1);
 		IDriverInput tank = new TankInput(driverGamepad);
 		IDriverInput arcade = new ArcadeInput(driverGamepad);
 		IOperatorInput operator = new OperatorInput(operatorGamepad);
-		teleopController = new TeleopController(arcade, operator, tank, arcade);
+		teleopController = new TeleopController(tank, operator, tank, arcade);
 		encoder = new DistanceEncoder(new MotorEncoder(leftMotor), gearShifter);
 		autoController = new AutoController(new NothingAutonomous());
 		testController = new TestController(driverGamepad);
@@ -160,24 +185,33 @@ public class Robot extends IterativeRobot implements IRobot {
 	 */
 	@Override
     public void autonomousInit() {
+	    // Setting the limit switch to be normally closed
+	    // ensures that the motors will disable if the limit switches break.
+//	    armMotor.ConfigFwdLimitSwitchNormallyOpen(false);
+//	    armFollower.ConfigFwdLimitSwitchNormallyOpen(false);
+
 		sensorData.sendAttackColor("tegra-ubuntu:5888", SmartDashboard.getString("Enemy Color"));
 		
-		if (SmartDashboard.getBoolean("Auto Program Enabled")) {
+		if (false && SmartDashboard.getBoolean("Auto Program Enabled")) {
 			String source = SmartDashboard.getString("Auto Program");
 			AutoState program = StateMachineCompiler.compile(source, sensorData);
 			autoController = new AutoController(program);
 		} else {
 			autoDriveDistance = SmartDashboard.getNumber("Distance");
 			lidarMotorSpeed = SmartDashboard.getNumber("Initial Lidar Speed");
-			autoController = new AutoController(
-					new ForwardAutonomous(600, -0.5)
-					.addNext(new RotateAutonomous(320, -1, RotateAutonomous.TurnDirection.Left))
-					.addNext(new ForwardAutonomous(4100, -0.5))
-					.addNext(new RotateAutonomous(750, -1, RotateAutonomous.TurnDirection.Right))
-					.addNext(new VisionAutonomous(1500, -0.7, sensorData))
-					.addNext(new IntakeAutonomous(1500, -1))
-					.addNext(new IntakeAutonomous(1000, 1))
-					.addNext(new IntakeAutonomous(1500, -1)));
+			
+			autoController = new AutoController(new ForwardAutonomous(7000, 0.75)
+												.addNext(new ArmAutonomous(100, 0.5, LiftDirection.Down))); 
+												//TODO: investigate forwards backwards stuff.
+//			autoController = new AutoController
+//					new ForwardAutonomous(600, -0.5)
+//					.addNext(new RotateAutonomous(320, -1, RotateAutonomous.TurnDirection.Left))
+//					.addNext(new ForwardAutonomous(4100, -0.5))
+//					.addNext(new RotateAutonomous(750, -1, RotateAutonomous.TurnDirection.Right))
+//					.addNext(new VisionAutonomous(1500, -0.7, sensorData))
+//					.addNext(new IntakeAutonomous(1500, -1))
+//					.addNext(new IntakeAutonomous(1000, 1))
+//					.addNext(new IntakeAutonomous(1500, -1)));
 		}
 		/*
 		if (SmartDashboard.getBoolean("Low Bar")) {
@@ -212,6 +246,12 @@ public class Robot extends IterativeRobot implements IRobot {
 
     @Override
     public void teleopInit() {
+        // Setting the limit switches to be normally open
+        // ensures the motor always works even when the limit switch
+        // does not work. Note that this will cause a brief disabling of the arm.
+//        armMotor.ConfigFwdLimitSwitchNormallyOpen(true);
+//        armFollower.ConfigFwdLimitSwitchNormallyOpen(true);
+
     	lidarMotorSpeed = SmartDashboard.getNumber("Initial Lidar Speed");
     	
     	if (teleopController != null) {
@@ -283,13 +323,13 @@ public class Robot extends IterativeRobot implements IRobot {
 		rightMotor.set(speed * robotSpeed);
 		rightFollower.set(speed * robotSpeed);
 	}
-	
+
 	@Override
 	public void setArmSpeed(double speed) {
-		armMotor.set(speed * armSpeed);
-		armFollower.set(speed * armSpeed);
+		armMotor.set(speed);
+		armFollower.set(speed);
 	}
-	
+
 	@Override
 	public void setArmExtendSpeed(double speed) {
 		armExtendMotor.set(speed * armExtendSpeed);

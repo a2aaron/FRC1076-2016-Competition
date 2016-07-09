@@ -11,6 +11,11 @@ public class TeleopController implements IRobotController {
 	IDriverInput driverInput;
 	IOperatorInput operatorInput;
 	
+	double driverTurboSpeed = 1;
+	double operatorTurboSpeed = 0.75;
+	double armUpSpeed = 0.4;
+	double armDownSpeed = 0.23;
+	
 	GearShifter gearShifter;
 	
 	public TeleopController(IDriverInput driverInput, IOperatorInput operatorInput,
@@ -35,8 +40,29 @@ public class TeleopController implements IRobotController {
 	
 	@Override
 	public void teleopPeriodic(IRobot robot) {
-		robot.setArmSpeed(operatorInput.armSpeed());
-		robot.setArmExtendSpeed(operatorInput.armExtendSpeed());
+	    /*
+        Turbo mode increases the power going to the lift arm. This allows
+        the arm to recover from moving too far forwards. The driver has a full
+        power turbo while the operator has a 75% turbo. The driver takes precedence.
+        The turbo mode only applies when lowering the lift arm.
+
+        Note that the raising and lowering of the arm differ in speed even
+        when not in any turbo mode. Lowering is less powerful due to gravity
+        helping. This difference can not be turned off.
+        */
+	    double armSpeed = operatorInput.armSpeed();
+		if (armSpeed > 0) {
+		    robot.setArmSpeed(armSpeed * armUpSpeed);
+		} else {
+		    if (driverInput.turboArm()) {
+                robot.setArmSpeed(armSpeed * driverTurboSpeed);
+            } else if (operatorInput.operatorTurbo()) {
+                robot.setArmSpeed(armSpeed * operatorTurboSpeed);
+            } else {
+                robot.setArmSpeed(armSpeed * armDownSpeed);
+            }
+        }
+        robot.setArmExtendSpeed(operatorInput.armExtendSpeed());
 		robot.setIntakeSpeed(operatorInput.intakeSpeed());
 		robot.setIntakeElevation(operatorInput.intakeRaiseState());
 		MotorOutput drive = driverInput.driveTrainSpeed();
@@ -55,7 +81,6 @@ public class TeleopController implements IRobotController {
 		default:
 			break;
 		}
-
     	if (driverInput.shiftHigh()) {
     		gearShifter.shiftHigh(robot);
     	} else if (driverInput.shiftLow()) {
@@ -70,4 +95,20 @@ public class TeleopController implements IRobotController {
 
 	@Override
 	public void testPeriodic(IRobot robot) { }
+
+    public double getDriverTurboSpeed() {
+        return driverTurboSpeed;
+    }
+
+    public double getOperatorTurboSpeed() {
+        return operatorTurboSpeed;
+    }
+
+    public double getArmUpSpeed() {
+        return armUpSpeed;
+    }
+
+    public double getArmDownSpeed() {
+        return armDownSpeed;
+    }
 }

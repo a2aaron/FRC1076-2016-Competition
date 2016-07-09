@@ -47,4 +47,8 @@ public class ArcadeInput implements IDriverInput {
 			return ControlSide.Current;
 		}
 	}
+
+	public boolean turboArm() {
+		return gamepad.getButton(GamepadButton.B);
+	}
 }

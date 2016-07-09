@@ -6,6 +6,7 @@ public class MockDriverInput implements IDriverInput {
 	public double left, right;
 	public boolean brakes;
 	public ControlSide controlSide = ControlSide.Current;
+	public boolean turboArm;
 	
 	public void reset() {
 		left = right = 0;
@@ -36,4 +37,9 @@ public class MockDriverInput implements IDriverInput {
 	public ControlSide controlSide() {
 		return controlSide;
 	}
+
+    @Override
+    public boolean turboArm() {
+        return turboArm;
+    }
 }

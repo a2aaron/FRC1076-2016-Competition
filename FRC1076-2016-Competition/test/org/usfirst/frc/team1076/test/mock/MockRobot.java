@@ -67,5 +67,4 @@ public class MockRobot implements IRobot {
 	public void setArmExtendSpeed(double speed) {
 		this.extend = speed;
 	}
-
 }
