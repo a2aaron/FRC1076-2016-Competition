@@ -52,9 +52,8 @@ public class Robot extends IterativeRobot implements IRobot {
 	static final int RIGHT_INDEX = 1;
 	static final int RIGHT_FOLLOWER_INDEX = 2;
 	static final int INTAKE_INDEX = 5;
-	// None of the below indexes are correct.
-	static final int ARM_EXTEND_INDEX = 6;
-	static final int ARM_EXTEND_FOLLOWER_INDEX = 9;
+	static final int ARM_EXTEND_INDEX = 9;
+	static final int ARM_EXTEND_FOLLOWER_INDEX = 6;
 	static final int ARM_INDEX = 7;
 	static final int ARM_FOLLOWER_INDEX = 8;
 	double MOTOR_POWER_FACTOR = 0.9;
@@ -132,19 +131,11 @@ public class Robot extends IterativeRobot implements IRobot {
 		leftFollower.setInverted(true);
 		leftMotor.setInverted(true);
 //		armExtendMotor.setInverted(false);
-//		armExtendMotor.setInverted(false); //NO changes
 		armMotor.enableBrakeMode(true);
 		armFollower.enableBrakeMode(true);
 		armExtendMotor.enableBrakeMode(true);
 		armExtendFollower.enableBrakeMode(true);
 
-		
-//		armMotor.ConfigFwdLimitSwitchNormallyOpen(true);
-//		armMotor.ConfigRevLimitSwitchNormallyOpen(true);
-//		armMotor.enableLimitSwitch(true, true);
-//		armFollower.ConfigFwdLimitSwitchNormallyOpen(true);
-//		armFollower.ConfigRevLimitSwitchNormallyOpen(true);
-//		armFollower.enableLimitSwitch(true, true);
 		armExtendMotor.ConfigFwdLimitSwitchNormallyOpen(true);
 		armExtendMotor.ConfigRevLimitSwitchNormallyOpen(true);
 		armExtendMotor.enableLimitSwitch(true, true);
@@ -154,7 +145,6 @@ public class Robot extends IterativeRobot implements IRobot {
 		
 		armExtendFollower.changeControlMode(CANTalon.TalonControlMode.Follower);
 		armExtendFollower.set(ARM_EXTEND_INDEX);
-//		System.out.println("Enabled all limit switches");
 		// leftFollower.changeControlMode(TalonControlMode.Follower);
 		// leftFollower.set(LEFT_INDEX);
 		
