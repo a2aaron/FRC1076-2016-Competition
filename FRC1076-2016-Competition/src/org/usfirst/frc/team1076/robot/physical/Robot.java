@@ -5,6 +5,7 @@ import org.usfirst.frc.team1076.robot.ISolenoid;
 import org.usfirst.frc.team1076.robot.IRobot;
 import org.usfirst.frc.team1076.robot.controllers.AutoController;
 import org.usfirst.frc.team1076.robot.controllers.IRobotController;
+import org.usfirst.frc.team1076.robot.controllers.IRobotController.ArmPneumaticState;
 import org.usfirst.frc.team1076.robot.controllers.TeleopController;
 import org.usfirst.frc.team1076.robot.controllers.TestController;
 import org.usfirst.frc.team1076.robot.gamepad.ArcadeInput;
@@ -72,6 +73,7 @@ public class Robot extends IterativeRobot implements IRobot {
 	Compressor compressor = new Compressor(0);
 	ISolenoid intakePneumatic = new TwoSolenoid(1, 3);
 	ISolenoid shifterPneumatic = new TwoSolenoid(0, 2);
+	ISolenoid brakePneumatic = new OneSolenoid(4);
 	IDistanceEncoder encoder;
 	
 	IRobotController teleopController;
@@ -101,6 +103,7 @@ public class Robot extends IterativeRobot implements IRobot {
 	@Override
 	public void disabledInit() {
 		setBrakes(true);
+		setArmPneumatic(ArmPneumaticState.Off);
 	}
 	
     /**
@@ -156,7 +159,9 @@ public class Robot extends IterativeRobot implements IRobot {
 		// leftFollower.set(LEFT_INDEX);
 		
 		compressor.setClosedLoopControl(true);
-		setIntakeElevation(IntakeRaiseState.Lowered); //TODO: the lable for lowered and raised is swaped incorrectly!
+
+		setIntakeElevation(IntakeRaiseState.Raised);
+		setArmPneumatic(ArmPneumaticState.On);
 		
 		IGamepad driverGamepad = new Gamepad(0);
 		gearShifter.shiftLow(this);
@@ -259,6 +264,7 @@ public class Robot extends IterativeRobot implements IRobot {
     	} else {
     		System.out.println("Teleop Controller on Robot is null in teleopInit()");
     	}
+        setArmPneumatic(ArmPneumaticState.On);
     }
     
     /**
@@ -400,6 +406,21 @@ public class Robot extends IterativeRobot implements IRobot {
 			intakePneumatic.setNeutral();
 			break;
 		}
+	}
+	
+	@Override
+	public void setArmPneumatic(ArmPneumaticState state) {
+	    switch (state) {
+	    case On:
+	        brakePneumatic.setForward();
+	        break;
+	    case Off:
+	        brakePneumatic.setReverse();
+	        break;
+	    default:
+	        brakePneumatic.setNeutral();
+	        break;
+	    }
 	}
 	
 	private void controlLidarMotor() {

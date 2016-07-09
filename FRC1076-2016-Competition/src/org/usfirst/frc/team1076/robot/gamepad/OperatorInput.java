@@ -30,10 +30,8 @@ public class OperatorInput implements IOperatorInput {
 
 	@Override
 	public IntakeRaiseState intakeRaiseState() {
-		boolean up = gamepad.getButton(GamepadButton.LB) ||
-				gamepad.getButton(GamepadButton.Y);
-		boolean down = gamepad.getButton(GamepadButton.RB) ||
-				gamepad.getButton(GamepadButton.A);
+		boolean down = gamepad.getButton(GamepadButton.LB);
+		boolean up = gamepad.getButton(GamepadButton.RB);
 		if (up && down) {
 			return IntakeRaiseState.Neutral;
 		} else if (up) {
@@ -45,8 +43,9 @@ public class OperatorInput implements IOperatorInput {
 	}
 
 	@Override
-	public boolean operatorTurbo() {
-		return gamepad.getButton(GamepadButton.B);
+	public boolean turboArm() {
+		return gamepad.getButton(GamepadButton.A);
 	}
+
 }
 
