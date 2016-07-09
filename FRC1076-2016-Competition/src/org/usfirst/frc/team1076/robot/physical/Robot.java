@@ -237,9 +237,11 @@ public class Robot extends IterativeRobot implements IRobot {
 		} else {
 			autoDriveDistance = SmartDashboard.getNumber("Distance");
 			lidarMotorSpeed = SmartDashboard.getNumber("Initial Lidar Speed");
+//			autoController = new AutoController(new ForwardAutonomous(2000, 0.75));
 			
-			autoController = new AutoController(new ForwardAutonomous(7000, 0.75)
-												.addNext(new ArmAutonomous(100, 0.5, LiftDirection.Down))); 
+			autoController = new AutoController(new ArmAutonomous(750, -0.25, LiftDirection.Down)
+												.addNext(new ForwardAutonomous(5000, 0.75))); 
+
 												//TODO: investigate forwards backwards stuff.
 //			autoController = new AutoController
 //					new ForwardAutonomous(600, -0.5)
