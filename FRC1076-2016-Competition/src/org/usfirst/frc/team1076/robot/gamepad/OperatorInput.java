@@ -47,5 +47,9 @@ public class OperatorInput implements IOperatorInput {
 		return gamepad.getButton(GamepadButton.A);
 	}
 
+	@Override
+	public boolean replayButtonHeld() {
+	    return gamepad.getButton(GamepadButton.X);
+	}
 }
 

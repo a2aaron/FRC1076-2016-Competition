@@ -38,4 +38,9 @@ public class MockOperatorInput implements IOperatorInput {
     public boolean turboArm() {
         return operatorTurbo;
     }
+
+    @Override
+    public boolean replayButtonHeld() {
+        return replayButton;
+    }
 }

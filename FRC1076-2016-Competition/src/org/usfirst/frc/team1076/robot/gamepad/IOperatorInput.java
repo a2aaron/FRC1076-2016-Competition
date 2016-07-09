@@ -9,4 +9,5 @@ public interface IOperatorInput {
 	double armExtendSpeed();
 	double armSpeed();
 	boolean turboArm();
+    boolean replayButtonHeld();
 }

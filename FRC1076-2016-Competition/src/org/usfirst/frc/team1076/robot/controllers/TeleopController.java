@@ -121,6 +121,9 @@ public class TeleopController implements IRobotController {
         return armDownSpeed;
     }
 
+    public boolean replayActivated() {
+        return operatorInput.replayButtonHeld();
+    }
     
     public IDriverInput getDriverInput() {
         return driverInput;

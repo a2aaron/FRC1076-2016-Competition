@@ -2,6 +2,12 @@
 package org.usfirst.frc.team1076.robot.physical;
 
 import org.usfirst.frc.team1076.robot.ISolenoid;
+
+import java.io.EOFException;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
 import org.usfirst.frc.team1076.robot.IRobot;
 import org.usfirst.frc.team1076.robot.controllers.AutoController;
 import org.usfirst.frc.team1076.robot.controllers.IRobotController;
@@ -14,6 +20,9 @@ import org.usfirst.frc.team1076.robot.gamepad.IDriverInput.MotorOutput;
 import org.usfirst.frc.team1076.robot.gamepad.IGamepad;
 import org.usfirst.frc.team1076.robot.gamepad.IOperatorInput;
 import org.usfirst.frc.team1076.robot.gamepad.IOperatorInput.IntakeRaiseState;
+import org.usfirst.frc.team1076.robot.recordAndReplay.RecordController;
+import org.usfirst.frc.team1076.robot.recordAndReplay.ReplayController;
+import org.usfirst.frc.team1076.robot.recordAndReplay.ReplayInput;
 import org.usfirst.frc.team1076.robot.gamepad.OperatorInput;
 import org.usfirst.frc.team1076.robot.gamepad.TankInput;
 import org.usfirst.frc.team1076.robot.sensors.DistanceEncoder;
@@ -78,7 +87,13 @@ public class Robot extends IterativeRobot implements IRobot {
 	IRobotController teleopController;
 	IRobotController autoController;
 	IRobotController testController;
-	
+
+	File file = new File(System.getProperty("user.home") + "/" + "recording");
+	RecordController recordController;
+	ReplayController replayController;
+	boolean recordingInTest = true;
+	boolean replayEnabled = true;
+	boolean currentlyReplaying = false;
 	double robotSpeed = 1;
 	double intakeSpeed = 1;
 //	double armUpSpeed = 0.4;
@@ -103,6 +118,10 @@ public class Robot extends IterativeRobot implements IRobot {
 	public void disabledInit() {
 		setBrakes(true);
 		setArmPneumatic(ArmPneumaticState.Off);
+		if (recordingInTest && recordController.isRecording()) {
+		    System.out.println("End of recording.");
+		    recordController.stopRecording();
+		}
 	}
 	
 	
@@ -113,7 +132,7 @@ public class Robot extends IterativeRobot implements IRobot {
 	@Override
     public void robotInit() {
 		SmartDashboard.putBoolean("Low Bar", false);
-		SmartDashboard.putBoolean("Backwards", false);		
+		SmartDashboard.putBoolean("Backwards", false);
     	SmartDashboard.putNumber("LIDAR Speed", 80);
     	SmartDashboard.putNumber("Motor Tweak", MOTOR_POWER_FACTOR);
     	SmartDashboard.putString("Enemy Color", "red");
@@ -160,6 +179,28 @@ public class Robot extends IterativeRobot implements IRobot {
 		IDriverInput tank = new TankInput(driverGamepad);
 		IDriverInput arcade = new ArcadeInput(driverGamepad);
 		IOperatorInput operator = new OperatorInput(operatorGamepad);
+		
+		// Record and Replay System
+		if (replayEnabled) {
+		    try {
+		        // Ensure the file exists
+		        if (!file.exists()) {
+		            file.createNewFile();
+		        }
+		    } catch (EOFException e) {
+		        System.err.println("Recording file empty!");
+		    } catch (IOException e) {
+		        throw new RuntimeException(e.toString());
+		    }
+
+		    try {
+		        ReplayInput replay = new ReplayInput(file);
+		        recordController = new RecordController(file, tank, operator);
+		        replayController = new ReplayController(replay);
+		    } catch (Exception e) {
+		        throw new RuntimeException(e.toString());
+		    }
+		}
 		teleopController = new TeleopController(tank, operator, tank, arcade);
 		autoController = new AutoController(new NothingAutonomous());
 		testController = new TestController(driverGamepad);
@@ -250,7 +291,17 @@ public class Robot extends IterativeRobot implements IRobot {
 //        armFollower.ConfigFwdLimitSwitchNormallyOpen(true);
 
     	lidarMotorSpeed = SmartDashboard.getNumber("Initial Lidar Speed");
-    	
+        currentlyReplaying = false;
+        if (replayEnabled) {
+            ReplayInput replayInput = null;
+            try {
+                replayInput = new ReplayInput(file);
+            } catch (ClassNotFoundException | IOException e) {
+                e.printStackTrace();
+            }
+            replayController = new ReplayController(replayInput);
+            replayController.replayInit(this);
+        }
     	if (teleopController != null) {
     		teleopController.teleopInit(this);
     	} else {
@@ -266,6 +317,14 @@ public class Robot extends IterativeRobot implements IRobot {
     public void teleopPeriodic() {
     	controlLidarMotor();
     	commonPeriodic();
+    	if (replayEnabled && teleopController.replayActivated() && !currentlyReplaying) {
+    	    System.out.println("Replaying...");
+    	    currentlyReplaying = true;
+    	}
+    	while (currentlyReplaying) {
+    	    replayController.replayPeriodic(this);
+    	    currentlyReplaying = replayController.replaying();
+    	}
     	
     	if (teleopController != null) {
         	teleopController.teleopPeriodic(this);
@@ -276,7 +335,10 @@ public class Robot extends IterativeRobot implements IRobot {
     
     @Override
     public void testInit() {
-    	if (testController != null) {
+
+        if (recordingInTest) {
+            recordInit();
+        } else if (testController != null) {
     		testController.testPeriodic(this);
     	} else {
     		System.err.println("Test Controller on Robot is null in testInit()");
@@ -286,8 +348,9 @@ public class Robot extends IterativeRobot implements IRobot {
     @Override
     public void testPeriodic() {
     	commonPeriodic();
-    	
-    	if (testController != null) {
+    	if (recordingInTest) {
+    	    recordPeriodic();
+    	} else if (testController != null) {
     		testController.testPeriodic(this);
     	} else {
     		System.err.println("Test Controller on Robot is null in testInit()");
@@ -309,7 +372,27 @@ public class Robot extends IterativeRobot implements IRobot {
     public void disabledPeriodic() {
     	commonPeriodic();
     }
+
+    public void recordInit() {
+        if (file.exists()) {
+            boolean deleted = file.delete();
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            System.out.println("Deleted Previous File: " + deleted);
+        }
+        System.out.println("Now recording...");
+        teleopInit();
+        recordController.startRecording();
+    }
     
+    public void recordPeriodic() {
+        teleopPeriodic();
+        recordController.recordFrame();
+    }
+
 	@Override
 	public void setLeftSpeed(double speed) {
 		leftFollower.set(speed * MOTOR_POWER_FACTOR * robotSpeed);
