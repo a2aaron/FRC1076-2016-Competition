@@ -25,7 +25,6 @@ public class ReplayTest {
     MockRobot robot = new MockRobot();
     MockDriverInput driver = new MockDriverInput();
     MockOperatorInput operator = new MockOperatorInput();
-    String folder = "replay_test_files/";
 
     public void init() {
         driver.reset();
@@ -35,7 +34,7 @@ public class ReplayTest {
     public void ReadNothingTest() throws IOException, ClassNotFoundException {
         // Setup
         init();
-        File file = new File(folder+"nothing_test");
+        File file = new File("nothing_test");
         file.createNewFile();
         ReplayInput input = new ReplayInput(file);
         ReplayController controller = new ReplayController(input);
@@ -50,7 +49,7 @@ public class ReplayTest {
     public void RecordFrameReadTest() throws FileNotFoundException, ClassNotFoundException, IOException {
         // Setup
         init();
-        File file = new File(folder+"read_test");
+        File file = new File("read_test");
         RecordController controller = new RecordController(file, driver, operator);
         controller.startRecording();
         driver.left = 1;
@@ -75,7 +74,7 @@ public class ReplayTest {
     public void ManyFramesTest() throws IOException, ClassNotFoundException {
         init();
         // Setup
-        File file = new File(folder+"many_frames");
+        File file = new File("many_frames");
         RecordController controller = new RecordController(file, driver, operator);
         controller.startRecording();
         // Record
@@ -103,7 +102,7 @@ public class ReplayTest {
     public void ReplayInputTest() throws IOException, ClassNotFoundException {
         init();
         // Setup
-        File file = new File(folder+"replay_input");
+        File file = new File("replay_input");
         RecordController controller = new RecordController(file, driver, operator);
         controller.startRecording();
         // Record
@@ -129,7 +128,7 @@ public class ReplayTest {
     public void ReplayControllerTest() throws IOException, ClassNotFoundException {
         init();
         // Setup
-        File file = new File(folder+"replay_controller");
+        File file = new File("replay_controller");
         RecordController controller = new RecordController(file, driver, operator);
         controller.startRecording();
         // Record

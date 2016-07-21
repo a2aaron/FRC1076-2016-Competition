@@ -23,10 +23,9 @@ public class RecordTest {
     MockDriverInput driver = new MockDriverInput();
     MockOperatorInput operator = new MockOperatorInput();
 
-    String folder = "record_test_files/";
     @Test
     public void createEmptyFileTest() {
-        File file = new File(folder+"empty_test");
+        File file = new File("empty_test");
         RecordController record = new RecordController(file, null, null);
         record.startRecording();
         record.stopRecording();
@@ -39,7 +38,7 @@ public class RecordTest {
     
     @Test
     public void createSingleFrameTest() throws IOException, ClassNotFoundException {
-        File file = new File(folder+"one_frame_test");
+        File file = new File("one_frame_test");
         RecordController record = new RecordController(file, driver, operator);
         record.startRecording();
         // Make some simple possible inputs
@@ -49,7 +48,7 @@ public class RecordTest {
         record.stopRecording();
         assertTrue("File should exist", file.exists());
 
-        FileInputStream fis = new FileInputStream(folder+"one_frame_test");
+        FileInputStream fis = new FileInputStream("one_frame_test");
         ObjectInputStream ois = new ObjectInputStream(fis);
         LinkedList<Object[]> frames = (LinkedList<Object[]>) ois.readObject();
         assertEquals("Exactly one frame should be in the output",
@@ -60,7 +59,7 @@ public class RecordTest {
 
     @Test 
     public void recorderThrowsExceptionTest() {
-        File file = new File(folder+"exception_test");
+        File file = new File("exception_test");
         RecordController record = new RecordController(file, null, null);
         assertFalse(record.isRecording());
         try {
@@ -71,7 +70,7 @@ public class RecordTest {
 
     @Test
     public void multiRecordingTest() throws FileNotFoundException, IOException, ClassNotFoundException {
-        File file = new File(folder+"multi_test");
+        File file = new File("multi_test");
         RecordController record = new RecordController(file, driver, operator);
         record.startRecording();
         operator.extend = 1;
