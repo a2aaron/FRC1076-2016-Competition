@@ -29,7 +29,6 @@ public class ReplayController {
 
     public void replayPeriodic(IRobot robot) {
         replayInput.getFrame();
-        replayInput.print();
         teleop.teleopPeriodic(robot);
     }
 
